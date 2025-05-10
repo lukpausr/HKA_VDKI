@@ -30,6 +30,7 @@ def load_configuration():
         # Load the configuration file
         with open(config_path) as f:
             config = yaml.safe_load(f)
+            print(f"Loaded configuration from {config_path}")
 
     except Exception as e:
     
@@ -47,5 +48,6 @@ def load_configuration():
         # Load the configuration file
         with open(config_path) as f:
             config = yaml.safe_load(f)
+            print(f"Loaded configuration from {config_path}")
 
     return config
