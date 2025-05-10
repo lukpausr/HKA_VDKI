@@ -11,7 +11,7 @@ def load_configuration():
     pc_name = os.environ['COMPUTERNAME'] if os.name == 'nt' else os.uname().nodename
 
     # Print the detected PC name for verification
-    # print(f"PC Name: {pc_name}")
+    print(f"PC Name: {pc_name}")
 
     # Check the PC name and set the path for the configuration file accordingly
     try:
@@ -20,6 +20,10 @@ def load_configuration():
             config_path = "config/config_default.yaml"
         elif pc_name == 'Desktop-Mika':
             config_path = "config/config_mika.yaml"
+        elif pc_name == '?-Marie':
+            config_path = "config/config_marie.yaml"
+        elif pc_name == '?-Luka':
+            config_path = "config/config_luka.yaml"
         else:
             config_path = "config/config_mika.yaml"
 
@@ -33,6 +37,10 @@ def load_configuration():
             config_path = "../config/config_default.yaml"
         elif pc_name == 'Desktop-Mika':
             config_path = "../config/config_mika.yaml"
+        elif pc_name == '?-Marie':
+            config_path = "config/config_marie.yaml"
+        elif pc_name == '?-Luka':
+            config_path = "config/config_luka.yaml"
         else:
             config_path = "../config/config_mika.yaml"
 
