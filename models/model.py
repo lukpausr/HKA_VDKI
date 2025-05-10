@@ -116,7 +116,7 @@ class Model_Template(pl.LightningModule):
         # Apply 2 1d-convolutional layers
         # TODO: Define layers for model here
         self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels, 64 * factor, kernel_size=kernel_size, stride=1, padding=self.padding)
+            nn.Conv2d(in_channels, 64, kernel_size=kernel_size, stride=1, padding=self.padding)
         )
     
     # TODO: Implement a forward pass
