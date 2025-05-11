@@ -1,4 +1,9 @@
+
+
 path_to_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data
+
+wandb_project_name: VDKI-Hasen
+
 
 seed: 42
 batch_size: 32
