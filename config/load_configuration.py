@@ -17,7 +17,7 @@ def load_configuration():
     try:
 
         if pc_name == 'DESKTOP-LUKAS':
-            config_path = "config/config_default.yaml"
+            config_path = "config/config_lukas.yaml"
         elif pc_name == 'Desktop-Mika':
             config_path = "config/config_mika.yaml"
         elif pc_name == '?-Marie':
@@ -35,7 +35,7 @@ def load_configuration():
     except Exception as e:
     
         if pc_name == 'DESKTOP-LUKAS':
-            config_path = "../config/config_default.yaml"
+            config_path = "../config/config_lukas.yaml"
         elif pc_name == 'Desktop-Mika':
             config_path = "../config/config_mika.yaml"
         elif pc_name == '?-Marie':
