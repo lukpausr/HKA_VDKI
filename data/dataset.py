@@ -96,7 +96,7 @@ class SmallAnimalsDataset(torch.utils.data.Dataset):
         image = io.imread(image_path)
         
         # TODO: Implement label loading from file path
-        raise NotImplementedError("This method is not yet implemented.")
+        raise NotImplementedError("This method is not yet implemented. We need to extract the label somehow")
 
         sample = {'image': image, 'label': 0}
 

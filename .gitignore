@@ -5,3 +5,5 @@ utils/__pycache__/*
 config/__pycache__/*
 data/__pycache__/*
 .vscode/settings.json
+downloaded_images/*
+utils/downloaded_images/*
