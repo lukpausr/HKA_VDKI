@@ -5,5 +5,5 @@ wandb_project_name: VDKI-Hasen
 wandb_experiment_name: experiment_cifar_cats_and_dogs_transfer_learning
 learning_rate: 0.001
 seed: 42
-batch_size: 256
+batch_size: 128
 max_epochs: 50
