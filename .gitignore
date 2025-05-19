@@ -10,3 +10,4 @@ utils/downloaded_images/*
 data/cifar*
 wandb/*
 VDKI-Hasen/*
+lightning_logs/*
