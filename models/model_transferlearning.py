@@ -17,6 +17,7 @@ class TransferLearningModule(pl.LightningModule):
         self.model = model
         self.learning_rate = learning_rate
         self.criterion = torch.nn.BCEWithLogitsLoss()
+        self.sigmoid = torch.nn.Sigmoid()
 
         # Metrics
         self.train_accuracy = BinaryAccuracy()
@@ -35,7 +36,9 @@ class TransferLearningModule(pl.LightningModule):
         prediction = self(x)
         loss = self.criterion(prediction.squeeze(), y.float())
 
-        preds = prediction.squeeze()
+        probs = self.sigmoid(prediction.squeeze())
+        preds = (probs > 0.5).long()  # shape: (batch_size, 1)
+
         self.train_accuracy.update(preds, y.int())
 
         self.log("train_loss", loss)
@@ -47,7 +50,9 @@ class TransferLearningModule(pl.LightningModule):
         prediction = self(x)
         loss = self.criterion(prediction.squeeze(), y.float())
 
-        preds = prediction.squeeze()
+        probs = self.sigmoid(prediction.squeeze())
+        preds = (probs > 0.5).long()  # shape: (batch_size, 1)
+
         self.val_accuracy.update(preds, y.int())
         self.val_preds_epoch.append(preds.detach().cpu())
         self.val_targets_epoch.append(y.detach().cpu())
