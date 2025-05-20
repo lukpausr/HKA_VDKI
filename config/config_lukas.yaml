@@ -1,8 +1,10 @@
-path_to_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data
+path_to_data: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data
+path_to_models: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/
+path_to_model: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/catsdogs_model_20250519_213605.ckpt
 
 wandb_entity: VDKI-Hasen
 wandb_project_name: VDKI-Hasen
-wandb_experiment_name: experiment_cifar_cats_and_dogs_transfer_learning
+wandb_experiment_name: cifar_cats_n_dogs_cnn
 learning_rate: 0.001
 seed: 42
 batch_size: 128
