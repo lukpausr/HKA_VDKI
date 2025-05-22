@@ -1,0 +1,44 @@
+
+# # # Datenaugmentierungen
+
+# 1. Spiegeln - wird auf alle Bilder angewandt (=2 Bilder)
+
+# # 2. Pro Bild 2 verschiedene Drehungen (mit Random Parameter zwischen +-20 Grad + Cropping) (+4 Bilder)
+
+# # # Nun auf alle "Ergebnis"-Bilder anwenden, Nutzen von "Wahrscheinlichkeiten"
+
+    Sättigung / Farbe (mit Random Parameter im sinnvollen Bereich)
+    Nacht
+    Affine Transformation (+ Cropping) --> Untersuchen, ob sinnvoll
+
+# Ergebnis:
+- Original
+- Original gespiegelt
+- Original gedreht (+) Sättigung/Nacht/Affin
+- original gedreht (-) Sättigung/Nacht/Affin
+- Original gespiegelt gedreht (+) Sättigung/Nacht/Affin
+- Original gespiegelt gedreht (-) Sättigung/Nacht/Affin
+
+--> Also nun 6-fache Menge an Bildern
+
+Ziel:
+Eigenes Script für Augmentierung:
+
+Ausgangslage:
+- RAW - Ordner mit Bildern (von Marie)
+- - Folder: Zwergkaninchen (Dateinamen: Zwergkaninchen_0001_OK ... 00xx_OK)
+- - Folder: Kleintiere (Dateinamen: TIER-A_0001_NOK ... TIER-B_0001_NOK)
+
+Zielsituation - alles in neuen Ordner!
+- DATASET_AUFGABE_1
+- - Folder: TRAINING_DATA       (70%)
+- - - Zwergkaninchen
+- - - Kleintiere
+- - Folder: VALIDATION_DATA     (15%)
+- - Folder: TEST_DATA           (15%)
+
+Zurodnung mit test_train_split via Pfade
+
+Vorgehen: Vor der Augmentierung werden die einzelnen Rohdaten (also z.B. 70% der Zwergkaninchen) dem Ordner TRAINING_DATA zugeordnet. Erst dann erfolgt in diesem Ordner die Augmentierung.
+Warum?: Damit sich aufgrund der Augmentierung nicht Bilder eines gleichen Zwergkaninchens in verschiedenen Ordnern wie "VALIDATION" und "TRAINING" wieder finden.
+

@@ -20,6 +20,9 @@ class CatsDogsModel(pl.LightningModule):
         self.criterion = nn.BCEWithLogitsLoss()
         self.sigmoid = nn.Sigmoid()
         self.save_hyperparameters()
+        self.optimizer = "adamw"  # adam, sgd, adamw
+
+        
 
         # CNN Model
         self.model = nn.Sequential(
@@ -64,7 +67,14 @@ class CatsDogsModel(pl.LightningModule):
         Returns:
             torch.optim.Optimizer: An Adam optimizer initialized with the model's parameters and the specified learning rate.
         """
-        return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        if(self.optimizer == "adam"):
+            return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        elif(self.optimizer == "sgd"):
+            return torch.optim.SGD(self.parameters(), lr=self.learning_rate)
+        elif(self.optimizer == "adamw"):
+            return torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
+        else:
+            raise ValueError(f"Unsupported optimizer: {self.optimizer}. Supported optimizers are: adam, sgd, adamw.")
     
     def forward(self, x):
         """
