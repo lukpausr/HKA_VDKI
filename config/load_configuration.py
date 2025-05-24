@@ -22,7 +22,7 @@ def load_configuration():
             config_path = "config/config_mika.yaml"
         elif pc_name == '?-Marie':
             config_path = "config/config_marie.yaml"
-        elif pc_name == '?-Luka':
+        elif pc_name == 'DESKTOP-BLKLC13':
             config_path = "config/config_luka.yaml"
         else:
             config_path = "config/config_mika.yaml"
@@ -40,7 +40,7 @@ def load_configuration():
             config_path = "../config/config_mika.yaml"
         elif pc_name == '?-Marie':
             config_path = "config/config_marie.yaml"
-        elif pc_name == '?-Luka':
+        elif pc_name == 'DESKTOP-BLKLC13':
             config_path = "config/config_luka.yaml"
         else:
             config_path = "../config/config_mika.yaml"
