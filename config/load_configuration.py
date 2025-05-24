@@ -2,6 +2,7 @@ import os
 import yaml
 
 def load_configuration():
+
     """
     Load the configuration file based on the PC name.
     """
