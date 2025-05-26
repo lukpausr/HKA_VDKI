@@ -314,10 +314,10 @@ class KaninchenModel(CatsDogsModel):
             nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
             nn.BatchNorm2d(num_features=out_channels),
             nn.ReLU(),
-            nn.MaxPool2d(pool_kernel)
+            #nn.MaxPool2d(pool_kernel)
             )
 
-        scaling_factor = 2  # Adjusting for input size of (3, 128, 128)
+        #scaling_factor = 2  # Adjusting for input size of (3, 128, 128)
         self.conv1 = conv_block(3, 32)                     # (32, 64, 64)
         self.conv2 = conv_block(32, 64)     # (64, 32, 32)
         self.conv3 = conv_block(64, 128)    # (128, 16, 16)
@@ -326,11 +326,9 @@ class KaninchenModel(CatsDogsModel):
 
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(512 * 8 * 8, 1024), nn.ReLU(),
+            nn.Linear(512 * 128 * 128, 1024), nn.ReLU(),
             nn.Dropout(0.5),
-            nn.Linear(1024, 256), nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(256, 1)
+            nn.Linear(1024, 1)
         )
         self.model = nn.Sequential(
             self.conv1,
