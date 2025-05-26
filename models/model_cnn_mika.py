@@ -317,16 +317,16 @@ class KaninchenModel(CatsDogsModel):
             nn.MaxPool2d(pool_kernel)
             )
 
-        scaling_factor = 1  # Adjusting for input size of (3, 128, 128)
-        self.conv1 = conv_block(3, scaling_factor*32)                     # (32, 64, 64)
-        self.conv2 = conv_block(scaling_factor*32, scaling_factor*64)     # (64, 32, 32)
-        self.conv3 = conv_block(scaling_factor*64, scaling_factor*128)    # (128, 16, 16)
-        self.conv4 = conv_block(scaling_factor*128, scaling_factor*256)   # (256, 8, 8)
-        self.conv5 = conv_block(scaling_factor*256, scaling_factor*512)   # (512, 4, 4)
+        scaling_factor = 2  # Adjusting for input size of (3, 128, 128)
+        self.conv1 = conv_block(3, 32)                     # (32, 64, 64)
+        self.conv2 = conv_block(32, 64)     # (64, 32, 32)
+        self.conv3 = conv_block(64, 128)    # (128, 16, 16)
+        self.conv4 = conv_block(128, 256)   # (256, 8, 8)
+        self.conv5 = conv_block(256, 512)   # (512, 4, 4)
 
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(512 * 4 * 4, 1024), nn.ReLU(),
+            nn.Linear(512 * 8 * 8, 1024), nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(1024, 256), nn.ReLU(),
             nn.Dropout(0.5),
