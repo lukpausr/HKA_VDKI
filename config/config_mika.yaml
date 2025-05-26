@@ -1,4 +1,11 @@
 path_to_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data
+path_to_test_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Test_Dataset
+path_to_train_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Train_Dataset
+path_to_val_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Val_Dataset
+
+path_to_raw_pics: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/data_scraper/Google-Image-Scraper/Bilder_Marie
+path_to_split_aug_pics: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Datasets_aug
+
 path_to_models: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/
 path_to_model: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/catsdogs_model_20250519_213605.ckpt
 
@@ -9,3 +16,5 @@ learning_rate: 0.001
 seed: 42
 batch_size: 32
 max_epochs: 10
+image_size: 128
+#image_scaling_factor: 1
