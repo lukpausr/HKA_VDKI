@@ -1,0 +1,11 @@
+path_to_split_aug_pics: /Users/mariewinkler/Documents/HKA/S2/VdKI/Bilder/Datasets_aug
+
+wandb_entity: VDKI-Hasen
+wandb_project_name: VDKI-Hasen
+wandb_experiment_name: experiment_cifar_cats_and_dogs_cnn_learning
+learning_rate: 0.001
+seed: 42
+batch_size: 32
+max_epochs: 10
+image_size: 128
+#image_scaling_factor: 1
