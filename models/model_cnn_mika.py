@@ -11,6 +11,36 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc, roc_auc_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
+class ResidualBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, downsample=False):
+        super(ResidualBlock, self).__init__()
+
+        stride = 2 if downsample else 1
+
+        self.conv_block = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, stride=stride),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+        )
+
+        # Identity shortcut
+        self.skip = nn.Sequential()
+        if downsample or in_channels != out_channels:
+            self.skip = nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride),
+                nn.BatchNorm2d(out_channels),
+            )
+
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        identity = self.skip(x)
+        out = self.conv_block(x)
+        out += identity
+        return self.relu(out)
+
 class CatsDogsModel(pl.LightningModule):
     def __init__(self, learning_rate=1e-3):
         super().__init__()
@@ -322,23 +352,81 @@ class KaninchenModel(CatsDogsModel):
         self.conv2 = conv_block(64, 128)          # Output: (128, 32, 32)
         self.conv3 = conv_block(128, 256)         # Output: (256, 16, 16)
         self.conv4 = conv_block(256, 512)         # Output: (512, 8, 8)
-        # self.conv5 = conv_block(256, 512)  
+        self.conv5 = conv_block(256, 512)  
+
+        self.cnn = nn.Sequential(
+            self.conv1,
+            self.conv2,
+            self.conv3,
+            self.conv4,
+            # self.conv5
+        )
 
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(512 * 8 * 8, 256), nn.ReLU(),
+            nn.Linear(512 * 8 * 8, 256), 
+            nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(256, 1)
         )
 
         self.model = nn.Sequential(
-            self.conv1,
-            self.conv2,
-            self.conv3,
-            self.conv4,
-            # self.conv5,
+            self.cnn,
             self.classifier
         )
 
     def forward(self, x):
         return self.model(x)
+    
+class KaninchenModelResidual(CatsDogsModel):
+    def __init__(self, learning_rate=1e-3):
+        """
+        Initializes the KaninchenModel with a specific learning rate.
+        Args:
+            learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
+        """
+        super().__init__(learning_rate)
+        self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
+
+        # CNN Model
+        # This model is designed for input tensors of size (3, 128, 128)
+        # Define a helper function for a Conv-BN-ReLU-MaxPool block
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(num_features=out_channels),
+                nn.ReLU(),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(num_features=out_channels),
+                nn.ReLU(),
+                nn.MaxPool2d(pool_kernel)
+                )
+
+        #scaling_factor = 2  # Adjusting for input size of (3, 128, 128)
+        self.init_conv = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            )
+
+        self.layer1 = conv_block(64, 128)              # Input: (3, 128, 128) # -> Output: (64, 64, 64)
+        self.layer2 = conv_block(128, 128)             # Output: (128, 32, 32)
+        self.layer3 = conv_block(128, 256)             # Output: (256, 16, 16)
+        self.layer4 = ResidualBlock(256, 256, downsample=True)       # Output: (256, 8, 8)
+
+        # self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.flatten = nn.Flatten()
+
+        self.fc = nn.Linear(256*8*8, 1)  # Binary classification
+
+    def forward(self, x):
+        x = self.init_conv(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        # x = self.layer5(x)
+        # x = self.pool(x)
+        x = self.flatten(x)
+        x = self.fc(x)
+        return x
