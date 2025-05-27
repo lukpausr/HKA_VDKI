@@ -5,8 +5,9 @@ import os
 import torch
 import pandas as pd
 import numpy as np
-from skimage import io, transform
-# from scipy.ndimage import gaussian_filter1d
+# from skimage import io, transform
+from PIL import Image
+from torchvision.transforms import v2
 
 # Custom Dataset for Pytorch
 # Source: https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
@@ -23,9 +24,6 @@ class SmallAnimalsDataset(torch.utils.data.Dataset):
 
         # Transformations to be applied to the data
         self.transform = transform
-
-
-
 
         # TODO: Change code to allow dynamic loading of data instead of loading all data at once
         # TODO: Change code to use images instead of csv files
@@ -106,3 +104,77 @@ class SmallAnimalsDataset(torch.utils.data.Dataset):
 
         # Return the sample
         return sample
+    
+class BinaryImageDataset(torch.utils.data.Dataset):
+    """
+    A custom PyTorch Dataset for loading images from a folder and assigning binary labels based on filename suffix.
+    Args:
+        path_to_image_folder (str): Path to the folder containing image files.
+        transform (callable, optional): Optional transform to be applied on a sample.
+    Attributes:
+        path_to_image_folder (str): Directory containing the images.
+        filepaths (list): List of image filenames in the directory.
+        transform (callable, optional): Transform to apply to each image.
+    Methods:
+        __len__(): Returns the number of images in the dataset.
+        __getitem__(idx): Loads an image and its binary label based on filename.
+            The label is 1 if the filename ends with '_ok', 0 if it ends with '_nok'.
+            Raises ValueError if the filename does not match the expected pattern.
+    """
+    def __init__(self, path_to_image_folder, transform=None):
+        self.path_to_image_folder = path_to_image_folder
+        self.filepaths = os.listdir(path_to_image_folder)
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.filepaths)
+
+    def __getitem__(self, idx):
+        img_path = os.path.join(self.path_to_image_folder, self.filepaths[idx])
+        image = Image.open(img_path).convert("RGB")
+
+        # Check if idx is a tensor and convert to list if necessary
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        # Label is 1 if filename ends with '_ok', 0 if ends with '_nok'
+        basename = os.path.basename(img_path)
+        basename = basename.lower().split('.')[0]
+        if '_ok' in basename:
+            label = 1
+        elif '_nok' in basename:
+            label = 0
+        else:
+            raise ValueError(f"Filename {basename} does not contain expected substring '_ok' or '_nok'")
+        
+        if self.transform:
+            image = self.transform(image)
+
+        return image, label
+    
+if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    from config.load_configuration import load_configuration
+
+    config = load_configuration()
+
+    dataset = BinaryImageDataset(
+        path_to_image_folder=config['path_to_split_aug_pics'] + '/train/',
+        transform=None  # Add any transformations if needed
+    )
+
+    dataset_size = len(dataset)
+    print(f"Dataset size: {dataset_size}")
+
+    # Example of getting an item
+    for i in range(5):  # Print first 5 items
+        image, label = dataset[i]
+        print(f"Image {i}: {image.size}, Label: {label}")
+
+        import matplotlib.pyplot as plt
+
+        plt.imshow(image)
+        plt.title(f"Label: {label}")
+        plt.axis('off')
+        plt.show()

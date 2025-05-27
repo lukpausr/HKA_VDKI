@@ -14,11 +14,11 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve,
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
-from data.cats_and_dogs import BinaryCIFARDataModule
-from models.model_cnn_mika import CatsDogsModel
+# from data.cats_and_dogs import BinaryCIFARDataModule
+# from models.model_cnn_mika import CatsDogsModel
 from models.model_cnn_mika import KaninchenModel
-from data.cats_and_dogs import KaninchenDataModule
-from data.Kaninchen_Module import BinaryImageDataModule
+# from data.cats_and_dogs import KaninchenDataModule
+from data.datamodule import BinaryImageDataModule
 
 # %% [markdown]
 # ### Loading Configuration
