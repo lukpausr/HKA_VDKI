@@ -2,7 +2,7 @@ path_to_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data
 
 wandb_entity: VDKI-Hasen
 wandb_project_name: VDKI-Hasen
-path_to_raw_pics: "C:\\Users\\lobster\\Documents\\HKA\\Kurse\\VDKIß\\Projekt\\test_photos"
+path_to_raw_pics: "C:\\Users\\lobster\\Documents\\HKA\\Kurse\\VDKI\\Projekt\\test_photos"
 path_to_split_aug_pics: "C:\\Users\\lobster\\Documents\\HKA\\Kurse\\VDKI\\Projekt\\test_data"
 wandb_experiment_name: experiment_cifar_cats_and_dogs_transfer_learning
 learning_rate: 0.001
