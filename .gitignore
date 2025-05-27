@@ -11,3 +11,4 @@ data/cifar*
 wandb/*
 VDKI-Hasen/*
 lightning_logs/*
+checkpoints/*
