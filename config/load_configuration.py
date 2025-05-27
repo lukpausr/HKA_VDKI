@@ -42,7 +42,7 @@ def load_configuration():
         elif pc_name == 'MacBook-Pro-de-Marie-7.local':
             config_path = "config/config_marie.yaml"
         elif pc_name == 'DESKTOP-BLKLC13':
-            config_path = "config/config_luka.yaml"
+            config_path = "../config/config_luka.yaml"
         else:
             config_path = "../config/config_mika.yaml"
 
