@@ -295,3 +295,49 @@ class CatsDogsModel(pl.LightningModule):
         plt.legend()
         plt.title("ROC Curve")
         plt.show()
+
+class KaninchenModel(CatsDogsModel):
+    def __init__(self, learning_rate=1e-3):
+        """
+        Initializes the KaninchenModel with a specific learning rate.
+        Args:
+            learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
+        """
+        super().__init__(learning_rate)
+        self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
+
+        # CNN Model
+        # This model is designed for input tensors of size (3, 128, 128)
+        # Define a helper function for a Conv-BN-ReLU-MaxPool block
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+            nn.BatchNorm2d(num_features=out_channels),
+            nn.ReLU(),
+            #nn.MaxPool2d(pool_kernel)
+            )
+
+        #scaling_factor = 2  # Adjusting for input size of (3, 128, 128)
+        self.conv1 = conv_block(3, 32)                     # (32, 64, 64)
+        self.conv2 = conv_block(32, 64)     # (64, 32, 32)
+        self.conv3 = conv_block(64, 128)    # (128, 16, 16)
+        self.conv4 = conv_block(128, 256)   # (256, 8, 8)
+        self.conv5 = conv_block(256, 512)   # (512, 4, 4)
+
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(512 * 128 * 128, 1024), nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(1024, 1)
+        )
+        self.model = nn.Sequential(
+            self.conv1,
+            self.conv2,
+            self.conv3,
+            self.conv4,
+            self.conv5,
+            self.classifier
+        )
+
+    def forward(self, x):
+        return self.model(x)

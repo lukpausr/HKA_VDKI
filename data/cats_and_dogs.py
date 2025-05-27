@@ -6,6 +6,9 @@ from torchvision.datasets import CIFAR10
 from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
 import pytorch_lightning as pl
+import os
+from torch.utils.data import Dataset
+from PIL import Image
 
 # CIFAR10 Dataset mit nur Katzen und Hunden
 class BinaryCIFARDataModule(pl.LightningDataModule):
@@ -59,3 +62,53 @@ def get_binary_cifar(train=True, transform=None):
     binary_dataset = Subset(dataset, binary_indices)
     binary_dataset = BinaryCIFAR(binary_dataset)
     return binary_dataset
+
+class KaninchenDataModule(BinaryCIFARDataModule):
+    def __init__(self, batch_size=32, num_workers=2, transform=None, persistent_workers=True):
+        super().__init__(batch_size, num_workers, transform, persistent_workers)
+
+    def setup(self, stage=None):   
+        self.train_dataset = BinaryFolderDataset(
+            folder="D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Datasets_aug/train",
+            transform=self.transform
+        )
+
+        self.val_dataset = BinaryFolderDataset(
+            folder="D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Datasets_aug/val",
+            transform=self.transform
+        )
+
+        self.test_dataset = BinaryFolderDataset(
+            folder="D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Datasets_aug/test",
+            transform=self.transform
+        )
+
+    def test_dataloader(self):
+        return DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, persistent_workers=self.persistent_workers)
+    
+    def train_dataloader(self):
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers, persistent_workers=self.persistent_workers)
+    
+    def val_dataloader(self):
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, persistent_workers=self.persistent_workers)
+    
+class BinaryFolderDataset(Dataset):
+    def __init__(self, folder, transform=None):
+        self.folder = folder
+        self.transform = transform
+        self.subset = []
+        for fname in os.listdir(folder):
+            if fname.endswith(('.png', '.jpg', '.jpeg')):
+                label = 1 if '_ok' in fname else 0 if '_nok' in fname else None
+                if label is not None:
+                    self.subset.append((os.path.join(folder, fname), label))
+
+    def __getitem__(self, idx):
+        path, label = self.subset[idx]
+        img = Image.open(path).convert('RGB')
+        if self.transform:
+            img = self.transform(img)
+        return img, label
+    
+    def __len__(self):
+        return len(self.subset)
