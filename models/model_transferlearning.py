@@ -11,14 +11,20 @@ from sklearn.metrics import roc_curve, auc, roc_auc_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 class TransferLearningModule(pl.LightningModule):
-    def __init__(self, model, learning_rate=1e-3):
+    def __init__(self, model, learning_rate=1e-3, optimizer_name='adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__()
 
         # Model and hyperparameters
         self.model = model
-        self.learning_rate = learning_rate
+
+        self.learning_rate = learning_rate          # Hyperparameter tuned by optuna
+        self.optimizer_name = optimizer_name        # Hyperparameter tuned by optuna
+        self.weight_decay = weight_decay            # Hyperparameter tuned by optuna
+        self.scheduler_name = scheduler_name        # Hyperparameter tuned by optuna
+
         self.criterion = torch.nn.BCEWithLogitsLoss()
         self.sigmoid = torch.nn.Sigmoid()
+
         self.save_hyperparameters()
 
         # Metrics
@@ -43,7 +49,21 @@ class TransferLearningModule(pl.LightningModule):
         Returns:
             torch.optim.Optimizer: An Adam optimizer initialized with the model's parameters and the specified learning rate.
         """
-        return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        if self.optimizer_name == "Adam":
+            optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+        elif self.optimizer_name == "SGD":
+            optimizer = torch.optim.SGD(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, momentum=0.9)
+        elif self.optimizer_name == "AdamW":
+            optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+
+        if self.scheduler_name == "StepLR":
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+            return [optimizer], [scheduler]
+        elif self.scheduler_name == "CosineAnnealingLR":
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=self.trainer.max_epochs)
+            return [optimizer], [scheduler]
+        else:
+            return optimizer
 
     def forward(self, x):
         """
@@ -159,8 +179,8 @@ class TransferLearningModule(pl.LightningModule):
 
         # Log to wandb
         wandb.log({
-            "Validation Data PR Curve": wandb.plot.pr_curve(y_true, y_probas_stacked, labels=["cat", "dog"]),
-            "Validation Data ROC Curve": wandb.plot.roc_curve(y_true, y_probas_stacked, labels=["cat", "dog"]),
+            "Validation Data PR Curve": wandb.plot.pr_curve(y_true, y_probas_stacked, labels=["Kleintiere", "Zwergkaninchen"]),
+            "Validation Data ROC Curve": wandb.plot.roc_curve(y_true, y_probas_stacked, labels=["Kleintiere", "Zwergkaninchen"]),
             "Validation Data ROC AUC": roc_auc_score(y_true, y_probas),
             "Validation Data Confusion Matrix": wandb.Image(fig)
         })

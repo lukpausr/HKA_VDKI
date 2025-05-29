@@ -16,6 +16,10 @@ path_to_model: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Tes
 
 wandb_entity: VDKI-Hasen
 wandb_project_name: VDKI-Hasen
+
+# Hyperparameter tuning using Optuna
+number_of_trials: 10
+
 wandb_experiment_name: binaryClassification_tl
 learning_rate: 0.001
 seed: 42
