@@ -52,9 +52,11 @@ class OptunaTrainer:
         Returns:
             WandbLogger: An initialized WandbLogger object configured for the current experiment.
         """
-        now_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
         exp_name = (
-            f"TL_bs{self.config['batch_size']}"
+            f"{self.config['model_name']}"
+            f"_cls{self.config['model_classifier_layers']}"
+            f"_bs{self.config['batch_size']}"
             f"_img{self.config['image_size']}"
             f"_opt{self.config['optimizer']}"
             f"_lr{self.config['learning_rate']:.0e}"
@@ -79,6 +81,8 @@ class OptunaTrainer:
                 'weight_decay': self.config['weight_decay'],
                 # 'scheduler': self.config['scheduler'],        # Already logged by WandbLogger
                 'dataset': self.dataset_name,
+                'model_classifier_layers': self.config['model_classifier_layers'],
+                'model_name': self.config['model_name']
             }
         )
 
@@ -94,21 +98,23 @@ class OptunaTrainer:
             float: The validation loss after training, or float("inf") if training failed.
         """
         # Suggest hyperparameters
-        self.config['batch_size'] = trial.suggest_categorical("batch_size", [32, 64, 128, 192])
+        self.config['batch_size'] = trial.suggest_categorical("batch_size", [32, 64, 128])
         self.config['image_size'] = trial.suggest_categorical("image_size", [128, 192, 256])
 
-        self.config['max_epochs'] = trial.suggest_int("max_epochs", 10, 50)
+        self.config['max_epochs'] = trial.suggest_int("max_epochs", 20, 40)
         self.config['accumulate_grad_batches'] = trial.suggest_categorical("accumulate_grad_batches", [1, 2, 4])
         self.config['precision'] = trial.suggest_categorical("precision", ["16-mixed", 32])
 
         self.config['optimizer'] = trial.suggest_categorical("optimizer", ["Adam", "SGD", "AdamW"])
-        self.config['learning_rate'] = trial.suggest_float("learning_rate", 1e-5, 1e-2, log=True)
+        self.config['learning_rate'] = trial.suggest_float("learning_rate", 1e-4, 1e-2, log=True)
         self.config['weight_decay'] = trial.suggest_float("weight_decay", 1e-6, 1e-2, log=True)
 
         self.config['scheduler'] = trial.suggest_categorical("scheduler", ["StepLR", "CosineAnnealingLR", None])
 
-        # Setup Wandb Logger
-        wandb_logger = self._setup_wandb_logger()
+        self.config['model_classifier_layers'] = trial.suggest_int("model_classifier_layers", 1, 2)
+
+        # Initialize model
+        self.model, self.config['model_name'] = self.model(self.config['model_classifier_layers'])
 
         # Prepare transformations and datamodule
         transform = self._build_transform(self.config['image_size'])
@@ -119,6 +125,9 @@ class OptunaTrainer:
             num_workers=2,
             persistent_workers=True
         )
+
+        # Setup Wandb Logger
+        wandb_logger = self._setup_wandb_logger()
 
         # Initialize Lightning model
         lightning_model = TransferLearningModule(
@@ -156,4 +165,5 @@ class OptunaTrainer:
         val_loss = trainer.callback_metrics.get("val_loss")
         wandb.finish()
 
+        print(f"Optuna Validation loss: {val_loss.item() if val_loss else 'N/A'}")
         return val_loss.item() if val_loss else float("inf")

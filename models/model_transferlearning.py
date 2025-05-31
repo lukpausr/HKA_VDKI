@@ -25,7 +25,7 @@ class TransferLearningModule(pl.LightningModule):
         self.criterion = torch.nn.BCEWithLogitsLoss()
         self.sigmoid = torch.nn.Sigmoid()
 
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=['model'])
 
         # Metrics
         self.train_accuracy = BinaryAccuracy()

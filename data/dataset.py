@@ -140,9 +140,10 @@ class BinaryImageDataset(torch.utils.data.Dataset):
         # Label is 1 if filename ends with '_ok', 0 if ends with '_nok'
         basename = os.path.basename(img_path)
         basename = basename.lower().split('.')[0]
-        if '_ok' in basename:
+        print(f"Processing file: {basename}")
+        if '_ok_' in basename:
             label = 1
-        elif '_nok' in basename:
+        elif '_nok_' in basename:
             label = 0
         else:
             raise ValueError(f"Filename {basename} does not contain expected substring '_ok' or '_nok'")
