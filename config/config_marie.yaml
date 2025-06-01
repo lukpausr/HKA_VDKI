@@ -8,4 +8,9 @@ seed: 42
 batch_size: 32
 max_epochs: 10
 image_size: 128
+#name_list: [apollo,  aster, helios, nyx, selene]
+
+# zum testen
+name_list: [kaninchen, maus, ratte, eichhoernchen, frettchen, katze, hase, hund, igel, mader, waschbaer, siebenschlaefer, meerschweinchen, schlange]
+
 #image_scaling_factor: 1

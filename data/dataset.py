@@ -179,3 +179,85 @@ if __name__ == "__main__":
         plt.title(f"Label: {label}")
         plt.axis('off')
         plt.show()
+
+
+class MultiClassImageDataset(torch.utils.data.Dataset):
+    """
+    A custom PyTorch Dataset for loading images from a folder and assigning binary labels based on filename suffix.
+    Args:
+        path_to_image_folder (str): Path to the folder containing image files.
+        transform (callable, optional): Optional transform to be applied on a sample.
+    Attributes:
+        path_to_image_folder (str): Directory containing the images.
+        filepaths (list): List of image filenames in the directory.
+        transform (callable, optional): Transform to apply to each image.
+    Methods:
+        __len__(): Returns the number of images in the dataset.
+        __getitem__(idx): Loads an image and its binary label based on filename.
+            The label is 1 if the filename ends with '_ok', 0 if it ends with '_nok'.
+            Raises ValueError if the filename does not match the expected pattern.
+    """
+    def __init__(self, path_to_image_folder, name_list, transform=None):
+        self.path_to_image_folder = path_to_image_folder
+        self.filepaths = os.listdir(path_to_image_folder)
+        self.transform = transform
+        self.name_list = name_list
+
+    def __len__(self):
+        return len(self.filepaths)
+
+    def __getitem__(self, idx):
+        img_path = os.path.join(self.path_to_image_folder, self.filepaths[idx])
+        image = Image.open(img_path).convert("RGB")
+
+        # Apply lower() and split('.')[0] to all elements in name_list
+        self.name_list = [name.lower().split('.')[0] for name in self.name_list]
+
+        # Check if idx is a tensor and convert to list if necessary
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        # Label is 1 if filename ends with '_ok', 0 if ends with '_nok'
+        basename = os.path.basename(img_path)
+        basename = basename.lower().split('.')[0]
+        print(f"Processing file: {basename}")
+
+        # Assign label based on whether any element of name_list is in the basename
+        label = 0  # default label
+        for i, name in enumerate(self.name_list):
+            name = name.lower().split('.')[0]
+            if name in basename:
+                label = i + 1
+                break
+
+        if self.transform:
+            image = self.transform(image)
+
+        return image, label
+    
+if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    from config.load_configuration import load_configuration
+
+    config = load_configuration()
+
+    dataset = BinaryImageDataset(
+        path_to_image_folder=config['path_to_split_aug_pics'] + '/train/',
+        transform=None  # Add any transformations if needed
+    )
+
+    dataset_size = len(dataset)
+    print(f"Dataset size: {dataset_size}")
+
+    # Example of getting an item
+    for i in range(5):  # Print first 5 items
+        image, label = dataset[i]
+        print(f"Image {i}: {image.size}, Label: {label}")
+
+        import matplotlib.pyplot as plt
+
+        plt.imshow(image)
+        plt.title(f"Label: {label}")
+        plt.axis('off')
+        plt.show()

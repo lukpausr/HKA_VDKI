@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 # from skimage import io, transform
 
 from data.dataset import SmallAnimalsDataset
-from data.dataset import BinaryImageDataset
+from data.dataset import BinaryImageDataset, MultiClassImageDataset
 
 # Custom Data Module for Pytorch Lightning
 # Source: https://pytorch-lightning.readthedocs.io/en/1.1.8/introduction_guide.html#data
@@ -153,7 +153,7 @@ class Animal_DataModule(pl.LightningDataModule):
             persistent_workers=True,
             shuffle=False,
         )
-    
+
 class BinaryImageDataModule(pl.LightningDataModule):
     def __init__(self, data_dir, batch_size=32, num_workers=2, transform=None, persistent_workers=True):
         super().__init__()
@@ -213,6 +213,74 @@ if __name__ == "__main__":
     config = load_configuration()
 
     dm = BinaryImageDataModule(data_dir=config['path_to_split_aug_pics'], batch_size=config['batch_size'], num_workers=0, persistent_workers=True)
+    try:
+        pickle.dumps(dm)
+        print("Pickling succeeded!")
+    except Exception as e:
+        print(f"Pickling failed: {e}")
+
+        
+    
+class MultiClassImageDataModule(pl.LightningDataModule):
+    def __init__(self, data_dir, name_list, batch_size=32, num_workers=2, transform=None, persistent_workers=True):
+        super().__init__()
+        self.data_dir = data_dir
+        self.name_list = name_list
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+        self.persistent_workers = persistent_workers
+
+        self.transform = transform if transform is not None else transform.ToTensor()
+
+    def setup(self, stage=None):
+        self.train_dataset = MultiClassImageDataset(self.data_dir + '/train/', self.name_list, self.transform)
+        self.val_dataset = MultiClassImageDataset(self.data_dir + '/test/', self.name_list, self.transform)
+        self.test_dataset = MultiClassImageDataset(self.data_dir + '/val/', self.name_list, self.transform)
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_dataset, 
+            batch_size=self.batch_size,
+            shuffle=True, 
+            num_workers=self.num_workers
+        )
+
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset, 
+            batch_size=self.batch_size,
+            shuffle=False, 
+            num_workers=self.num_workers
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_dataset, 
+            batch_size=self.batch_size,
+            shuffle=False, 
+            num_workers=self.num_workers
+        )
+
+if __name__ == "__main__":
+    # # Example usage
+    # data_dir = "path/to/data"
+    # data_module = MultiClassImageDataset(data_dir, batch_size=16)
+    # data_module.setup()
+
+    # train_loader = data_module.train_dataloader()
+    # for images, labels in train_loader:
+    #     print(images.shape, labels.shape)
+    #     break  # Just to demonstrate loading one batch
+
+    import pickle
+    import sys
+
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    from config.load_configuration import load_configuration
+
+    config = load_configuration()
+
+    dm = MultiClassImageDataset(data_dir=config['path_to_split_aug_pics'], batch_size=config['batch_size'], num_workers=0, persistent_workers=True)
     try:
         pickle.dumps(dm)
         print("Pickling succeeded!")
