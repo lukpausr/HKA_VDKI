@@ -416,7 +416,7 @@ class KaninchenModelResidual(CnnModel):
         #scaling_factor = 2  # Adjusting for input size of (3, 128, 128)
         self.init_conv = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=3, padding=1, stride=1),
-            nn.BatchNorm2d(32),
+            nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             )
 
@@ -440,4 +440,264 @@ class KaninchenModelResidual(CnnModel):
         # x = self.pool(x)
         x = self.flatten(x)
         x = self.fc(x)
+        return x
+    
+#SiLU
+class KaninchenModel_v1(CnnModel):
+    def __init__(self, learning_rate=1e-3):
+        """
+        Initializes the KaninchenModel with a specific learning rate.
+        Args:
+            learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
+        """
+        super().__init__(learning_rate)
+        self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
+
+        # CNN Model
+        # This model is designed for input tensors of size (3, 128, 128)
+        # Define a helper function for a Conv-BN-ReLU-MaxPool block
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(num_features=out_channels),
+                nn.SiLU(),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(num_features=out_channels),
+                nn.SiLU(),
+                nn.MaxPool2d(pool_kernel)
+                )
+
+        #scaling_factor = 2  # Adjusting for input size of (3, 128, 128)
+        self.init_conv = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(64),
+            nn.SiLU(inplace=True),
+            )
+
+        self.layer1 = conv_block(64, 128)              # Input: (3, 128, 128) # -> Output: (64, 64, 64)
+        self.layer2 = conv_block(128, 128)             # Output: (128, 32, 32)
+        self.layer3 = conv_block(128, 256)             # Output: (256, 16, 16)
+        self.layer4 = ResidualBlock(256, 256, downsample=True)       # Output: (256, 8, 8)
+
+        # self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.flatten = nn.Flatten()
+
+        self.fc = nn.Linear(256*8*8, 1)  # Binary classification
+
+    def forward(self, x):
+        x = self.init_conv(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.flatten(x)
+        x = self.fc(x)
+        return x
+    
+
+# Varied out_channels
+class KaninchenModel_v2(CnnModel):
+    def _init_(self, learning_rate=1e-3):
+        """
+        Initializes the KaninchenModel with a specific learning rate.
+        Args:
+            learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
+        """
+        super()._init_(learning_rate)
+        self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
+
+        # CNN Model
+        # This model is designed for input tensors of size (3, 128, 128)
+        # Define a helper function for a Conv-BN-ReLU-MaxPool block
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(num_features=out_channels),
+                nn.ReLU(),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(num_features=out_channels),
+                nn.ReLU(),
+                nn.MaxPool2d(pool_kernel)
+                )
+
+        #scaling_factor = 2  # Adjusting for input size of (3, 128, 128)
+        self.init_conv = nn.Sequential(
+            nn.Conv2d(3,128, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+            )
+
+        self.layer1 = conv_block(128, 128)        
+        self.layer2 = conv_block(128, 256)
+        self.layer3 = conv_block(256, 256)  
+        self.layer4 = conv_block(256, 512)  
+        self.layer5 = ResidualBlock(512, 512, downsample=True)      
+
+        # self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.flatten = nn.Flatten()
+
+        self.fc = nn.Linear(256*8*8, 1)  # Binary classification
+
+    def forward(self, x):
+        x = self.init_conv(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.layer5(x)
+        x = self.flatten(x)
+        x = self.fc(x)
+        return x
+
+
+# dense block
+class KaninchenModel_v3(CnnModel):
+    def __init__(self, learning_rate=1e-3):
+        super().__init__(learning_rate)
+        self.save_hyperparameters()
+
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(pool_kernel)
+            )
+
+        self.init_conv = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+        )
+
+        self.layer1 = conv_block(64, 128)              # (64, 128,128) -> (128, 64,64)
+        self.layer2 = conv_block(128, 128)             # (128, 64,64) -> (128, 32,32)
+        self.layer3 = conv_block(128, 256)             # (128, 32,32) -> (256, 16,16)
+        self.layer4 = ResidualBlock(256, 256, downsample=True)   # (256, 16,16) -> (256, 8,8)
+
+        # self.pool = nn.AdaptiveAvgPool2d((1, 1))  # (256, 1, 1)
+        self.flatten = nn.Flatten()
+
+        # Dense block
+        self.fc1 = nn.Linear(256, 128)
+        self.relu_fc1 = nn.ReLU(inplace=True)
+        self.fc2 = nn.Linear(128, 64)
+        self.relu_fc2 = nn.ReLU(inplace=True)
+
+        self.fc_out = nn.Linear(64, 1)  
+
+    def forward(self, x):
+        x = self.init_conv(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.pool(x)
+        x = self.flatten(x)
+
+        x = self.relu_fc1(self.fc1(x))
+        x = self.relu_fc2(self.fc2(x))
+        x = self.fc_out(x)
+        return x
+
+
+
+# dropout added
+class KaninchenModel_v4(CnnModel):
+    def __init__(self, learning_rate=1e-3):
+        super().__init__(learning_rate)
+        self.save_hyperparameters()
+
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(),
+                nn.MaxPool2d(pool_kernel),
+                nn.Dropout(0.25)
+            )
+
+        def final_block():
+            return nn.Sequential(
+                nn.Flatten(),
+                nn.Linear(128 * 16 * 16, 256),  # Matches your expected Flatten shape
+                nn.ReLU(),
+                nn.BatchNorm1d(256),
+                nn.Dropout(0.5),
+                nn.Linear(256, 1),
+                nn.Sigmoid()  # For binary classification
+            )
+        
+
+        self.layer1 = conv_block(3, 32)     # Input: (3, 128, 128) -> (32, 64, 64)
+        self.layer2 = conv_block(32, 64)    # -> (64, 32, 32)
+        self.layer3 = conv_block(64, 128)   # -> (128, 16, 16)
+        self.classifier = final_block()
+
+
+    def forward(self, x):
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.classifier(x)
+        return x
+    
+    
+#focus on presence not position
+class KaninchenModel_v5(CnnModel):
+    def _init_(self, learning_rate=1e-3):
+        super()._init_(learning_rate)
+        self.save_hyperparameters()
+
+        def ds_conv_block(in_channels, out_channels, pool_kernel=2):
+            return nn.Sequential(
+                # Depthwise Convolution
+                nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, groups=in_channels, bias=False),
+                nn.BatchNorm2d(in_channels),
+                nn.ReLU(inplace=True),
+
+                # Pointwise Convolution
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+
+                # Optional: Downsampling
+                nn.MaxPool2d(pool_kernel),
+                nn.Dropout(0.25)
+            )
+        
+        # Depthwise Separable Conv block
+        def ds_block(in_c, out_c):
+            return nn.Sequential(
+                ds_conv_block(in_c, out_c),
+                ds_conv_block(out_c, out_c),
+                nn.MaxPool2d(2),
+                nn.Dropout(0.25)
+            )
+
+        self.block1 = ds_block(3, 64)     # (3,128,128) → (64,64,64)
+        self.block2 = ds_block(64, 128)   # → (128,32,32)
+        self.block3 = ds_block(128, 256)  # → (256,16,16)
+        self.block4 = ds_block(256, 256)  # → (256,8,8)
+
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # → (256,1,1)
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(256, 1)
+        )
+
+
+    def forward(self, x):
+        x = self.block1(x)
+        x = self.block2(x)
+        x = self.block3(x)
+        x = self.block4(x)
+        x = self.global_pool(x)
+        x = self.classifier(x)
         return x
