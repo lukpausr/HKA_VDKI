@@ -42,7 +42,7 @@ class ResidualBlock(nn.Module):
         return self.relu(out)
 
 class CnnModel(pl.LightningModule):
-    def __init__(self, learning_rate=1e-3, optimizer_name='adam', weight_decay=0.0, scheduler_name='StepLR'):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__()
 
         # Model and hyperparameters
@@ -335,7 +335,7 @@ class CnnModel(pl.LightningModule):
         plt.show()
 
 class KaninchenModel(CnnModel):
-    def __init__(self, learning_rate=1e-3, optimizer_name='adam', weight_decay=0.0, scheduler_name='StepLR'):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         """
         Initializes the KaninchenModel with a specific learning rate.
         Args:
@@ -390,7 +390,7 @@ class KaninchenModel(CnnModel):
         return self.model(x)
     
 class KaninchenModelResidual(CnnModel):
-    def __init__(self, learning_rate=1e-3, optimizer_name='adam', weight_decay=0.0, scheduler_name='StepLR'):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         """
         Initializes the KaninchenModel with a specific learning rate.
         Args:
@@ -444,13 +444,13 @@ class KaninchenModelResidual(CnnModel):
     
 #SiLU
 class KaninchenModel_v1(CnnModel):
-    def __init__(self, learning_rate=1e-3):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         """
         Initializes the KaninchenModel with a specific learning rate.
         Args:
             learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
         """
-        super().__init__(learning_rate)
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
 
         # CNN Model
@@ -497,13 +497,13 @@ class KaninchenModel_v1(CnnModel):
 
 # Varied out_channels
 class KaninchenModel_v2(CnnModel):
-    def _init_(self, learning_rate=1e-3):
+    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         """
         Initializes the KaninchenModel with a specific learning rate.
         Args:
             learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
         """
-        super()._init_(learning_rate)
+        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
 
         # CNN Model
@@ -552,8 +552,8 @@ class KaninchenModel_v2(CnnModel):
 
 # dense block
 class KaninchenModel_v3(CnnModel):
-    def __init__(self, learning_rate=1e-3):
-        super().__init__(learning_rate)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
@@ -607,8 +607,8 @@ class KaninchenModel_v3(CnnModel):
 
 # dropout added
 class KaninchenModel_v4(CnnModel):
-    def __init__(self, learning_rate=1e-3):
-        super().__init__(learning_rate)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
@@ -651,8 +651,8 @@ class KaninchenModel_v4(CnnModel):
     
 #focus on presence not position
 class KaninchenModel_v5(CnnModel):
-    def _init_(self, learning_rate=1e-3):
-        super()._init_(learning_rate)
+    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def ds_conv_block(in_channels, out_channels, pool_kernel=2):

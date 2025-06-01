@@ -21,7 +21,7 @@ wandb_project_name: VDKI-Hasen
 # Hyperparameter tuning using Optuna
 number_of_trials: 20
 
-wandb_experiment_name: binaryClassification_tl
+wandb_experiment_name: binaryClassification_CNN
 learning_rate: 0.001
 seed: 42
 batch_size: 192
