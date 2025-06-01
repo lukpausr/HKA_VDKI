@@ -310,13 +310,13 @@ class CnnOptunaTrainer(OptunaTrainer):
         )
 
         # Initialize model
-        self.config['model_name'] = type(self.model).__name__
         lightning_model = self.model(
             learning_rate=self.config['learning_rate'],
             optimizer_name=self.config['optimizer'],
             weight_decay=self.config['weight_decay'],
             scheduler_name=self.config['scheduler'],
-        )      
+        )     
+        self.config['model_name'] = type(lightning_model).__name__
 
         # Setup Wandb Logger
         wandb_logger = self._setup_wandb_logger()   

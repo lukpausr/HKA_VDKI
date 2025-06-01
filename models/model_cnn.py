@@ -41,16 +41,20 @@ class ResidualBlock(nn.Module):
         out += identity
         return self.relu(out)
 
-class CatsDogsModel(pl.LightningModule):
-    def __init__(self, learning_rate=1e-3):
+class CnnModel(pl.LightningModule):
+    def __init__(self, learning_rate=1e-3, optimizer_name='adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__()
 
         # Model and hyperparameters
-        self.learning_rate = learning_rate
+        self.learning_rate = learning_rate          # Hyperparameter tuned by optuna
+        self.optimizer_name = optimizer_name        # Hyperparameter tuned by optuna
+        self.weight_decay = weight_decay            # Hyperparameter tuned by optuna
+        self.scheduler_name = scheduler_name        # Hyperparameter tuned by optuna
+
         self.criterion = nn.BCEWithLogitsLoss()
         self.sigmoid = nn.Sigmoid()
-        self.save_hyperparameters()
-        self.optimizer = "adamw"  # adam, sgd, adamw
+
+        self.save_hyperparameters(ignore=['model'])
 
         # CNN Model
         self.model = nn.Sequential(
@@ -94,14 +98,21 @@ class CatsDogsModel(pl.LightningModule):
         Returns:
             torch.optim.Optimizer: An Adam optimizer initialized with the model's parameters and the specified learning rate.
         """
-        if(self.optimizer == "adam"):
-            return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-        elif(self.optimizer == "sgd"):
-            return torch.optim.SGD(self.parameters(), lr=self.learning_rate)
-        elif(self.optimizer == "adamw"):
-            return torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
+        if self.optimizer_name == "Adam":
+            optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+        elif self.optimizer_name == "SGD":
+            optimizer = torch.optim.SGD(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, momentum=0.9)
+        elif self.optimizer_name == "AdamW":
+            optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+
+        if self.scheduler_name == "StepLR":
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+            return [optimizer], [scheduler]
+        elif self.scheduler_name == "CosineAnnealingLR":
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=self.trainer.max_epochs)
+            return [optimizer], [scheduler]
         else:
-            raise ValueError(f"Unsupported optimizer: {self.optimizer}. Supported optimizers are: adam, sgd, adamw.")
+            return optimizer
     
     def forward(self, x):
         """
@@ -323,14 +334,14 @@ class CatsDogsModel(pl.LightningModule):
         plt.title("ROC Curve")
         plt.show()
 
-class KaninchenModel(CatsDogsModel):
-    def __init__(self, learning_rate=1e-3):
+class KaninchenModel(CnnModel):
+    def __init__(self, learning_rate=1e-3, optimizer_name='adam', weight_decay=0.0, scheduler_name='StepLR'):
         """
         Initializes the KaninchenModel with a specific learning rate.
         Args:
             learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
         """
-        super().__init__(learning_rate)
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
 
         # CNN Model
@@ -378,14 +389,14 @@ class KaninchenModel(CatsDogsModel):
     def forward(self, x):
         return self.model(x)
     
-class KaninchenModelResidual(CatsDogsModel):
-    def __init__(self, learning_rate=1e-3):
+class KaninchenModelResidual(CnnModel):
+    def __init__(self, learning_rate=1e-3, optimizer_name='adam', weight_decay=0.0, scheduler_name='StepLR'):
         """
         Initializes the KaninchenModel with a specific learning rate.
         Args:
             learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
         """
-        super().__init__(learning_rate)
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
 
         # CNN Model
