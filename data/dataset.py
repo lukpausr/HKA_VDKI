@@ -9,6 +9,8 @@ import numpy as np
 from PIL import Image
 from torchvision.transforms import v2
 
+import random
+
 # Custom Dataset for Pytorch
 # Source: https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
 class SmallAnimalsDataset(torch.utils.data.Dataset):
@@ -153,6 +155,32 @@ class BinaryImageDataset(torch.utils.data.Dataset):
 
         return image, label
     
+class ReducedSizeBinaryImageDataset(BinaryImageDataset):
+    """
+    A custom PyTorch Dataset for loading images from a folder and assigning binary labels based on filename suffix.
+    Args:
+        path_to_image_folder (str): Path to the folder containing image files.
+        transform (callable, optional): Optional transform to be applied on a sample.
+    Attributes:
+        path_to_image_folder (str): Directory containing the images.
+        filepaths (list): List of image filenames in the directory.
+        transform (callable, optional): Transform to apply to each image.
+    Methods:
+        __len__(): Returns the number of images in the dataset.
+        __getitem__(idx): Loads an image and its binary label based on filename.
+            The label is 1 if the filename ends with '_ok', 0 if it ends with '_nok'.
+            Raises ValueError if the filename does not match the expected pattern.
+    """
+    def __init__(self, path_to_image_folder, transform=None):
+        self.path_to_image_folder = path_to_image_folder
+        self.filepaths = os.listdir(path_to_image_folder)
+
+        random.shuffle(self.filepaths)
+        reduced_size = max(1, int(len(self.filepaths) * 0.3))
+        self.filepaths = self.filepaths[:reduced_size]
+
+        self.transform = transform
+
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

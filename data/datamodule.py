@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 # from skimage import io, transform
 
 from data.dataset import SmallAnimalsDataset
-from data.dataset import BinaryImageDataset, MultiClassImageDataset
+from data.dataset import BinaryImageDataset, ReducedSizeBinaryImageDataset, MultiClassImageDataset
 
 # Custom Data Module for Pytorch Lightning
 # Source: https://pytorch-lightning.readthedocs.io/en/1.1.8/introduction_guide.html#data
@@ -192,6 +192,15 @@ class BinaryImageDataModule(pl.LightningDataModule):
             shuffle=False, 
             num_workers=self.num_workers
         )
+
+class ReducedSizeBinaryImageDataModule(BinaryImageDataModule):
+    def __init__(self, data_dir, batch_size=32, num_workers=2, transform=None, persistent_workers=True):
+        super().__init__(data_dir, batch_size, num_workers, transform, persistent_workers)
+
+    def setup(self, stage=None):
+        self.train_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/train/', self.transform)
+        self.val_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/test/', self.transform)
+        self.test_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/val/', self.transform)
 
 if __name__ == "__main__":
     # # Example usage
