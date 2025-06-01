@@ -176,7 +176,7 @@ class ReducedSizeBinaryImageDataset(BinaryImageDataset):
         self.filepaths = os.listdir(path_to_image_folder)
 
         random.shuffle(self.filepaths)
-        reduced_size = max(1, int(len(self.filepaths) * 0.3))
+        reduced_size = max(1, int(len(self.filepaths) * 0.5))
         self.filepaths = self.filepaths[:reduced_size]
 
         self.transform = transform
