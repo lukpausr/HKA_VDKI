@@ -92,8 +92,8 @@ class OptunaTrainer:
         raise NotImplementedError("This method should be implemented in subclasses.")
 
 class TLOptunaTrainer(OptunaTrainer):
-    def __init__(self, config, normalize_mean=[0.485, 0.456, 0.406], normalize_std=[0.229, 0.224, 0.225], dataset_name="DwarfRabbits-binary"):
-        super().__init__(TransferLearningModule, config, normalize_mean, normalize_std, dataset_name)
+    def __init__(self, model, config, normalize_mean=[0.485, 0.456, 0.406], normalize_std=[0.229, 0.224, 0.225], dataset_name="DwarfRabbits-binary"):
+        super().__init__(model, config, normalize_mean, normalize_std, dataset_name)
 
     def _build_transform(self, image_size):
         """
@@ -129,7 +129,8 @@ class TLOptunaTrainer(OptunaTrainer):
         """
         # Suggest hyperparameters
         self.config['batch_size'] = trial.suggest_categorical("batch_size", [32, 64, 128])
-        self.config['image_size'] = trial.suggest_categorical("image_size", [128, 192, 256])
+        # self.config['image_size'] = trial.suggest_categorical("image_size", [300])
+        self.config['image_size'] = self.config['image_size']
 
         self.config['max_epochs'] = trial.suggest_int("max_epochs", 20, 40)
         self.config['accumulate_grad_batches'] = trial.suggest_categorical("accumulate_grad_batches", [1, 2, 4])
