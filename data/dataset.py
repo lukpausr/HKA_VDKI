@@ -27,39 +27,6 @@ class SmallAnimalsDataset(torch.utils.data.Dataset):
         # Transformations to be applied to the data
         self.transform = transform
 
-        # TODO: Change code to allow dynamic loading of data instead of loading all data at once
-        # TODO: Change code to use images instead of csv files
-
-        # Read all files in directory and store them in a list
-        # for file in self.file_list:
-
-            # Read data from csv file
-            # temp_data = pd.read_csv(data_dir + file)
-            
-            # add gaussian distribution over peaks with width of 10
-            # reason: the loss function can handle the peaks better when they have a larger range / area for the loss function to work with
-            # for feature in Param.feature_list:
-            #     if(feature == 'P-peak' or feature == 'R-peak' or feature == 'T-peak'):
-                    
-            #         # add gaussian distribution over peaks with width of 10 // use constant to extend data by 0s when filtering with guassian
-            #         # temp_data[feature] = gaussian_filter1d(np.float64(temp_data[feature]), sigma=10, mode='constant')
-            #         # normalize between 0 and 1
-            #         max_val = max(temp_data[feature])
-            #         if(max_val > 0):
-            #             temp_data[feature] = temp_data[feature] * (1/max_val)
-
-            #         # Print Data with matplotlib
-            #         #import matplotlib.pyplot as plt
-            #         #plt.plot(temp_data[feature])
-            #         #plt.show()
-            
-            # add data to list
-            # self.data.append(temp_data)
-
-            # # Print the amount of loaded files every 1000 files for better overview during loading
-            # if len(self.data) % 1000 == 0:
-            #     print(f"DATASET: Loaded {len(self.data)} of {len(self.file_list)} files")
-
     # Return the total number of samples of the dataset
     def __len__(self):
         """
@@ -92,8 +59,12 @@ class SmallAnimalsDataset(torch.utils.data.Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        image_path = os.path.join(self.data_dir, self.file_list[idx])
-        image = io.imread(image_path)
+        img_path = os.path.join(self.data_dir, self.file_list[idx])
+        image = Image.open(img_path).convert("RGB")
+
+        # Check if idx is a tensor and convert to list if necessary
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
         
         # TODO: Implement label loading from file path
         raise NotImplementedError("This method is not yet implemented. We need to extract the label somehow")
