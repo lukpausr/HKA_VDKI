@@ -11,7 +11,7 @@ from sklearn.metrics import roc_curve, auc, roc_auc_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 class TransferLearningModule(pl.LightningModule):
-    def __init__(self, model, learning_rate=1e-3, optimizer_name='adam', weight_decay=0.0, scheduler_name='StepLR'):
+    def __init__(self, model, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__()
 
         # Model and hyperparameters
