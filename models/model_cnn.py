@@ -525,18 +525,18 @@ class KaninchenModel_v2(CnnModel):
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
             )
-
+        
         self.layer1 = conv_block(128, 128)        
         self.layer2 = conv_block(128, 256)
         self.layer3 = conv_block(256, 256)  
         self.layer4 = conv_block(256, 512)  
-        self.layer5 = ResidualBlock(512, 512, downsample=True)      
+        self.layer5 = ResidualBlock(512, 512, downsample=True)  
 
-        # self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))
         self.flatten = nn.Flatten()
+        self.fc = nn.Linear(512, 1)
 
-        self.fc = nn.Linear(256*8*8, 1)  # Binary classification
-
+    
     def forward(self, x):
         x = self.init_conv(x)
         x = self.layer1(x)
@@ -544,10 +544,11 @@ class KaninchenModel_v2(CnnModel):
         x = self.layer3(x)
         x = self.layer4(x)
         x = self.layer5(x)
+        x = self.pool(x)
         x = self.flatten(x)
         x = self.fc(x)
         return x
-
+    
 # dense block
 class KaninchenModel_v3(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
@@ -576,11 +577,11 @@ class KaninchenModel_v3(CnnModel):
         self.layer3 = conv_block(128, 256)             # (128, 32,32) -> (256, 16,16)
         self.layer4 = ResidualBlock(256, 256, downsample=True)   # (256, 16,16) -> (256, 8,8)
 
-        # self.pool = nn.AdaptiveAvgPool2d((1, 1))  # (256, 1, 1)
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))  # (256, 1, 1) 
         self.flatten = nn.Flatten()
 
         # Dense block
-        self.fc1 = nn.Linear(256, 128)
+        self.fc1 = nn.Linear(256, 128)        #A MODIFIER
         self.relu_fc1 = nn.ReLU(inplace=True)
         self.fc2 = nn.Linear(128, 64)
         self.relu_fc2 = nn.ReLU(inplace=True)
@@ -649,38 +650,29 @@ class KaninchenModel_v5(CnnModel):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
-        def ds_conv_block(in_channels, out_channels, pool_kernel=2):
+        # Depthwise Separable Convolution Block with Downsampling via stride
+        def ds_conv_block(in_channels, out_channels, downsample=True):
+            stride = 2 if downsample else 1
             return nn.Sequential(
-                # Depthwise Convolution
-                nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, groups=in_channels, bias=False),
+                # Depthwise
+                nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, stride=stride, groups=in_channels, bias=False),
                 nn.BatchNorm2d(in_channels),
                 nn.ReLU(inplace=True),
 
-                # Pointwise Convolution
+                # Pointwise
                 nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
                 nn.BatchNorm2d(out_channels),
                 nn.ReLU(inplace=True),
 
-                # Optional: Downsampling
-                nn.MaxPool2d(pool_kernel),
-                nn.Dropout(0.25)
-            )
-        
-        # Depthwise Separable Conv block
-        def ds_block(in_c, out_c):
-            return nn.Sequential(
-                ds_conv_block(in_c, out_c),
-                ds_conv_block(out_c, out_c),
-                nn.MaxPool2d(2),
                 nn.Dropout(0.25)
             )
 
-        self.block1 = ds_block(3, 64)     # (3,128,128) → (64,64,64)
-        self.block2 = ds_block(64, 128)   # → (128,32,32)
-        self.block3 = ds_block(128, 256)  # → (256,16,16)
-        self.block4 = ds_block(256, 256)  # → (256,8,8)
+        self.block1 = ds_conv_block(3, 64)      # (3,128,128) -> (64,64,64)
+        self.block2 = ds_conv_block(64, 128)    # -> (128,32,32)
+        self.block3 = ds_conv_block(128, 256)   # -> (256,16,16)
+        self.block4 = ds_conv_block(256, 256)   # -> (256,8,8)
 
-        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # → (256,1,1)
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # -> (256,1,1)
         self.classifier = nn.Sequential(
             nn.Flatten(),
             nn.Linear(256, 1)
