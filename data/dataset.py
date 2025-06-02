@@ -247,21 +247,20 @@ class MultiClassImageDataset(torch.utils.data.Dataset):
 
         # Label is 1 if filename ends with '_ok', 0 if ends with '_nok'
         basename = os.path.basename(img_path)
-        basename = basename.lower().split('.')[0]
-        print(f"Processing file: {basename}")
+        basename = basename.lower().split('_')[0]
+        # print(f"Processing file: {basename}")
 
         # Assign label based on whether any element of name_list is in the basename
-        label = 0  # default label
-        for i, name in enumerate(self.name_list):
-            name = name.lower().split('.')[0]
-            if name in basename:
-                label = i + 1
-                break
+        label = [0.0] * len(self.name_list)  # Initialize label with zeros
+        if basename in self.name_list:
+            label[self.name_list.index(basename)] = 1.0
+        else:
+            label[0] = 1.0  # Default to first class if no match found
 
         if self.transform:
             image = self.transform(image)
 
-        return image, label
+        return image, torch.tensor(label, dtype=torch.float32)
     
 if __name__ == "__main__":
     import sys
