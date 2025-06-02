@@ -494,16 +494,15 @@ class KaninchenModel_v1(CnnModel):
         x = self.fc(x)
         return x
     
-
 # Varied out_channels
 class KaninchenModel_v2(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         """
         Initializes the KaninchenModel with a specific learning rate.
         Args:
             learning_rate (float): The learning rate for the optimizer. Defaults to 1e-3.
         """
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()  # Save hyperparameters for logging and checkpointing
 
         # CNN Model
@@ -548,7 +547,6 @@ class KaninchenModel_v2(CnnModel):
         x = self.flatten(x)
         x = self.fc(x)
         return x
-
 
 # dense block
 class KaninchenModel_v3(CnnModel):
@@ -603,8 +601,6 @@ class KaninchenModel_v3(CnnModel):
         x = self.fc_out(x)
         return x
 
-
-
 # dropout added
 class KaninchenModel_v4(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
@@ -640,19 +636,17 @@ class KaninchenModel_v4(CnnModel):
         self.layer3 = conv_block(64, 128)   # -> (128, 16, 16)
         self.classifier = final_block()
 
-
     def forward(self, x):
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.classifier(x)
-        return x
-    
+        return x   
     
 #focus on presence not position
 class KaninchenModel_v5(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def ds_conv_block(in_channels, out_channels, pool_kernel=2):
@@ -691,7 +685,6 @@ class KaninchenModel_v5(CnnModel):
             nn.Flatten(),
             nn.Linear(256, 1)
         )
-
 
     def forward(self, x):
         x = self.block1(x)
