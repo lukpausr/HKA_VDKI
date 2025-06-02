@@ -7,14 +7,17 @@ path_to_raw_pics: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/data_s
 path_to_split_aug_pics: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Datasets_aug
 
 path_to_models: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/
-path_to_model: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/catsdogs_model_20250519_213605.ckpt
+path_to_model: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/TL_EfficientNetB4_model_20250602_150544.ckpt
 
 wandb_entity: VDKI-Hasen
 wandb_project_name: VDKI-Hasen
 wandb_experiment_name: experiment_cifar_cats_and_dogs_cnn_learning
+trainable_linear_layers: 1
 learning_rate: 0.001
 seed: 42
 batch_size: 32
 max_epochs: 10
 image_size: 128
+name_list: [unknown, kaninchen, maus, ratte, eichhoernchen, frettchen, katze, hase, hund, igel, mader, waschbaer, siebenschlaefer, meerschweinchen, schlange]
+#name_list: [apollo,  aster, helios, nyx, selene]
 #image_scaling_factor: 1
