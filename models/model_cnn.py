@@ -813,8 +813,8 @@ class KaninchenModel_v7(CnnModel):
 
 # SE block
 class KaninchenModel_v8(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
@@ -981,8 +981,8 @@ class KaninchenModel_v10(CnnModel):
 
 # v5(dropout and AdaptiveAvgPool2d) + out_channels + dense block 3 steps
 class KaninchenModel_v11(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         # Depthwise Separable Convolution Block with Downsampling via stride
@@ -1039,8 +1039,8 @@ class KaninchenModel_v11(CnnModel):
 
 # dense block 3 steps
 class KaninchenModel_v12(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
@@ -1097,8 +1097,8 @@ class KaninchenModel_v12(CnnModel):
 
 # out_channels + dense block 3 steps + GELU
 class KaninchenModel_v13(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
@@ -1156,8 +1156,8 @@ class KaninchenModel_v13(CnnModel):
     
 #v7(out_channels + dense block 3 steps) + conv_block(512,512)
 class KaninchenModel_v14(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
@@ -1216,8 +1216,8 @@ class KaninchenModel_v14(CnnModel):
 
 #v14(out_channels + dense block 3 steps + conv_block(512,512)) + conv_block(512,1024) + conv_block(1024,1024)
 class KaninchenModel_v15(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
@@ -1281,8 +1281,8 @@ class KaninchenModel_v15(CnnModel):
 
 # v7(out_channels + dense block 3 steps) + conv_block(64, 128)
 class KaninchenModel_v16(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
@@ -1341,8 +1341,8 @@ class KaninchenModel_v16(CnnModel):
 
 # v7(out_channels + dense block 3 steps) + ResidualBlock(512, 512, downsample=True) 
 class KaninchenModel_v17(CnnModel):
-    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
-        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
         self.save_hyperparameters()
 
         def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
