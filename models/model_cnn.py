@@ -850,8 +850,9 @@ class KaninchenModel_v8(CnnModel):
         x = self.layer4(x)
 
         # Squeeze: Global Avg Pool
-        se = F.adaptive_avg_pool2d(x, 1).view(x.size(0), -1)  # Shape: (B, 256)
-        se = F.relu(self.se_fc1(se))
+        
+        se = torch.nn.functional.adaptive_avg_pool2d(x, 1).view(x.size(0), -1)  # Shape: (B, 256)
+        se = torch.nn.functional.relu(self.se_fc1(se))
         se = self.sigmoid(self.se_fc2(se)).view(x.size(0), 256, 1, 1)  # Shape: (B, 256, 1, 1)
 
         # Excite: scale input features
