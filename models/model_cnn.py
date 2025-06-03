@@ -686,3 +686,283 @@ class KaninchenModel_v5(CnnModel):
         x = self.global_pool(x)
         x = self.classifier(x)
         return x
+    
+
+# v2 (out_channels) + v3 (dense block)
+class KaninchenModel_v6(CnnModel):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.save_hyperparameters()
+
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(pool_kernel)
+            )
+
+        self.init_conv = nn.Sequential(
+            nn.Conv2d(3, 128, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+        )
+
+        self.layer1 = conv_block(128, 128)        
+        self.layer2 = conv_block(128, 256)
+        self.layer3 = conv_block(256, 256)  
+        self.layer4 = conv_block(256, 512)  
+        self.layer5 = ResidualBlock(512, 512, downsample=True)  
+
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.flatten = nn.Flatten()
+
+        # Dense block
+        self.fc1 = nn.Linear(512, 128)        
+        self.relu_fc1 = nn.ReLU(inplace=True)
+        self.fc2 = nn.Linear(128, 64)
+        self.relu_fc2 = nn.ReLU(inplace=True)
+
+        self.fc_out = nn.Linear(64, 1)
+
+
+    def forward(self, x):
+        x = self.init_conv(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.pool(x)
+        x = self.flatten(x)
+
+        x = self.relu_fc1(self.fc1(x))
+        x = self.relu_fc2(self.fc2(x))
+        x = self.fc_out(x)
+        return x
+
+
+# v2 (out_channels) + v3 (dense block)
+class KaninchenModel_v7(CnnModel):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.save_hyperparameters()
+
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(pool_kernel)
+            )
+
+        self.init_conv = nn.Sequential(
+            nn.Conv2d(3, 128, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+        )
+
+        self.layer1 = conv_block(128, 128)        
+        self.layer2 = conv_block(128, 256)
+        self.layer3 = conv_block(256, 256)  
+        self.layer4 = conv_block(256, 512)  
+        self.layer5 = ResidualBlock(512, 512, downsample=True)  
+
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.flatten = nn.Flatten()
+
+        # Dense block
+        self.fc1 = nn.Linear(512, 256)        
+        self.relu_fc1 = nn.ReLU(inplace=True)
+        self.fc2 = nn.Linear(256, 128)        
+        self.relu_fc2 = nn.ReLU(inplace=True)
+        self.fc3 = nn.Linear(128, 64)
+        self.relu_fc3 = nn.ReLU(inplace=True)
+
+        self.fc_out = nn.Linear(64, 1)
+
+
+    def forward(self, x):
+        x = self.init_conv(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.pool(x)
+        x = self.flatten(x)
+
+        x = self.relu_fc1(self.fc1(x))
+        x = self.relu_fc2(self.fc2(x))
+        x = self.relu_fc3(self.fc3(x))
+        x = self.fc_out(x)
+        return x
+    
+    
+
+
+# SE block
+class KaninchenModel_v8(CnnModel):
+    def _init_(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super()._init_(learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.save_hyperparameters()
+
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(pool_kernel)
+            )
+
+        self.init_conv = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+        )
+
+        self.layer1 = conv_block(64, 128)
+        self.layer2 = conv_block(128, 128)
+        self.layer3 = conv_block(128, 256)
+        self.layer4 = ResidualBlock(256, 256, downsample=True)
+
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))  # Output: (B, 256, 1, 1)
+        self.flatten = nn.Flatten()
+        self.fc_out = nn.Linear(256, 1)
+
+        # SE block parameters
+        self.se_fc1 = nn.Linear(256, 256 // 16)
+        self.se_fc2 = nn.Linear(256 // 16, 256)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        x = self.init_conv(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+
+        # Squeeze: Global Avg Pool
+        se = F.adaptive_avg_pool2d(x, 1).view(x.size(0), -1)  # Shape: (B, 256)
+        se = F.relu(self.se_fc1(se))
+        se = self.sigmoid(self.se_fc2(se)).view(x.size(0), 256, 1, 1)  # Shape: (B, 256, 1, 1)
+
+        # Excite: scale input features
+        x = x * se  # Channel-wise multiplication
+
+        x = self.pool(x)
+        x = self.flatten(x)
+        x = self.fc_out(x)
+        return x
+    
+
+
+# new v3 (dense block)
+class KaninchenModel_v9(CnnModel):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.save_hyperparameters()
+
+        def conv_block(in_channels, out_channels, kernel_size=3, padding=1, pool_kernel=2):
+            return nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.SiLU(inplace=True),
+                nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, padding=padding),
+                nn.BatchNorm2d(out_channels),
+                nn.SiLU(inplace=True),
+                nn.MaxPool2d(pool_kernel)
+            )
+
+        self.init_conv = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1, stride=1),
+            nn.BatchNorm2d(64),
+            nn.SiLU(inplace=True),
+        )
+
+        self.layer1 = conv_block(64, 128)              # (64, 128,128) -> (128, 64,64)
+        self.layer2 = conv_block(128, 128)             # (128, 64,64) -> (128, 32,32)
+        self.layer3 = conv_block(128, 256)             # (128, 32,32) -> (256, 16,16)
+        self.layer4 = ResidualBlock(256, 256, downsample=True)   # (256, 16,16) -> (256, 8,8)
+
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))  # (256, 1, 1) 
+        self.flatten = nn.Flatten()
+
+        # Dense block
+        self.fc1 = nn.Linear(256, 128)        
+        self.act1 = nn.SiLU(inplace=True)
+        self.dropout1=nn.Dropout(0.3)
+        self.fc2 = nn.Linear(128, 64)
+        self.act2 = nn.SiLU(inplace=True)
+        self.dropout2=nn.Dropout(0.3)
+
+        self.fc_out = nn.Linear(64, 1)  
+
+    def forward(self, x):
+        x = self.init_conv(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.pool(x)
+        x = self.flatten(x)
+
+
+        x = self.act1(self.fc1(x))
+        x = self.dropout1(x)    
+        x = self.act2(self.fc2(x))
+        x = self.dropout2(x)    
+        x = self.fc_out(x)
+        return x
+    
+
+   
+# v2 (out_channels) + v5
+class KaninchenModel_v10(CnnModel):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
+        super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.save_hyperparameters()
+
+        # Depthwise Separable Convolution Block with Downsampling via stride
+        def ds_conv_block(in_channels, out_channels, downsample=True):
+            stride = 2 if downsample else 1
+            return nn.Sequential(
+                # Depthwise
+                nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, stride=stride, groups=in_channels, bias=False),
+                nn.BatchNorm2d(in_channels),
+                nn.ReLU(inplace=True),
+
+                # Pointwise
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(inplace=True),
+
+                nn.Dropout(0.25)
+            )
+
+        self.block1 = ds_conv_block(3, 128)      
+        self.block2 = ds_conv_block(128, 256)   
+        self.block3 = ds_conv_block(256, 512)  
+        self.block4 = ds_conv_block(512, 512)  
+
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # -> (512,1,1)
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(512, 1)
+        )
+
+    def forward(self, x):
+        x = self.block1(x)
+        x = self.block2(x)
+        x = self.block3(x)
+        x = self.block4(x)
+        x = self.global_pool(x)
+        x = self.classifier(x)
+        return x
