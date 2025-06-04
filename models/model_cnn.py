@@ -871,7 +871,7 @@ class KaninchenModel_v8(CnnModel):
     
 
 
-# dense block + dropout
+# dense block + dropout + SiLu
 class KaninchenModel_v9(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
