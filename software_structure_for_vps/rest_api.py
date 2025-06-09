@@ -21,28 +21,6 @@ class RabbitAPIClient:
         except requests.exceptions.RequestException as e:
             print("POST failed:", e)
             return None
-        
-    def turn_light_on(self):
-        url = f"{self.base_url}/light/on"
-        try:
-            response = requests.post(url)
-            response.raise_for_status()
-            print("Light ON")
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            print("Failed to turn light on:", e)
-            return None
-
-    def turn_light_off(self):
-        url = f"{self.base_url}/light/off"
-        try:
-            response = requests.post(url)
-            response.raise_for_status()
-            print("Light OFF")
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            print("Failed to turn light off:", e)
-            return None
 
         def health_check(self):
                 url = f"{self.base_url}/health"
