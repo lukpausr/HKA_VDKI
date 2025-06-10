@@ -174,7 +174,8 @@ class BinaryImageDataModule(pl.LightningDataModule):
             self.train_dataset, 
             batch_size=self.batch_size,
             shuffle=True, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
     def val_dataloader(self):
@@ -182,7 +183,8 @@ class BinaryImageDataModule(pl.LightningDataModule):
             self.val_dataset, 
             batch_size=self.batch_size,
             shuffle=False, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
     def test_dataloader(self):
@@ -190,7 +192,8 @@ class BinaryImageDataModule(pl.LightningDataModule):
             self.test_dataset, 
             batch_size=self.batch_size,
             shuffle=False, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
 class ReducedSizeBinaryImageDataModule(BinaryImageDataModule):
@@ -223,7 +226,8 @@ class MultiClassImageDataModule(pl.LightningDataModule):
             self.train_dataset, 
             batch_size=self.batch_size,
             shuffle=True, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
     def val_dataloader(self):
@@ -231,7 +235,8 @@ class MultiClassImageDataModule(pl.LightningDataModule):
             self.val_dataset, 
             batch_size=self.batch_size,
             shuffle=False, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
     def test_dataloader(self):
@@ -239,7 +244,8 @@ class MultiClassImageDataModule(pl.LightningDataModule):
             self.test_dataset, 
             batch_size=self.batch_size,
             shuffle=False, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
 if __name__ == "__main__":
