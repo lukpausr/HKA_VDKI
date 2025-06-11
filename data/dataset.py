@@ -97,6 +97,7 @@ class BinaryImageDataset(torch.utils.data.Dataset):
     def __init__(self, path_to_image_folder, transform=None):
         self.path_to_image_folder = path_to_image_folder
         self.filepaths = os.listdir(path_to_image_folder)
+        # self.filepaths = [f for f in os.listdir(path_to_image_folder) if '_v0' in f]
         self.transform = transform
 
     def __len__(self):

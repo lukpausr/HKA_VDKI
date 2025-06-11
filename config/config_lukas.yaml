@@ -9,11 +9,13 @@ path_to_val_data: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_
 path_to_raw_pics: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/data_scraper/Google-Image-Scraper/Bilder_Marie
 
 # Here the augmented images are stored
-path_to_split_aug_pics: C:\Users\lukas\SynologyDrive_IMS\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\datasaet_aufgabe1_aug
+path_to_split_aug_pics: C:\Users\lukas\SynologyDrive_IMS\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe1_aug
+path_to_split_raw_pics: C:\Users\lukas\SynologyDrive_IMS\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe1_raw
 
 # WandB configuration
 wandb_entity: VDKI-Hasen
-wandb_project_name: VDKI-Hasen
+wandb_project_name: VDKI-Hasen_TransferLearning
+# wandb_project_name: VDKI-Hasen_Hyperparameter_Tuning_V3
 
 # Hyperparameter tuning using Optuna
 number_of_trials: 20
