@@ -12,3 +12,4 @@ wandb/*
 VDKI-Hasen/*
 lightning_logs/*
 checkpoints/*
+Mika_Data/*
