@@ -6,9 +6,121 @@ from torchmetrics.classification import BinaryAccuracy, BinaryPrecision, BinaryR
 
 import numpy as np
 
+import timm
+
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc, roc_auc_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+def getEfficientNetB4_model(amount_of_trainable_linear_layers=2):
+    """
+    Function to get the EfficientNet B3 model with pretrained weights.
+    Returns:
+        model: A PyTorch model instance of EfficientNet B3.
+    """
+    # Load the EfficientNet B3 model with pretrained weights
+    model = timm.create_model('efficientnet_b4', pretrained=True)
+    
+    # Modify the classifier for binary classification
+    num_classes = 1  # For binary classification (OK/NOK)
+    if amount_of_trainable_linear_layers == 1:
+        model.classifier = torch.nn.Linear(model.classifier.in_features, num_classes)
+    elif amount_of_trainable_linear_layers == 2:
+        # If two linear layers are trainable, we add an intermediate layer
+        model.classifier = torch.nn.Sequential(
+            torch.nn.Dropout(p=0.2),  # Add dropout for regularization
+            torch.nn.Linear(model.classifier.in_features, 256),  # Intermediate layer
+            torch.nn.ReLU(),  # Activation function
+            torch.nn.Dropout(p=0.2),  # Another dropout layer
+            torch.nn.Linear(256, num_classes)
+        )
+    
+    # Freeze all layers except the classifier
+    for param in model.parameters():
+        param.requires_grad = False
+    for param in model.classifier.parameters():
+        param.requires_grad = True
+    
+    return model, "TL_EfficientNetB4"
+
+def getResNet152D_model(amount_of_trainable_linear_layers=2):
+
+    # Load the EfficientNet B3 model with pretrained weights
+    model = timm.create_model('resnet152d', pretrained=True)
+    
+    # Modify the classifier for binary classification
+    num_classes = 1  # For binary classification (OK/NOK)
+    if amount_of_trainable_linear_layers == 1:
+        model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
+    elif amount_of_trainable_linear_layers == 2:
+        # If two linear layers are trainable, we add an intermediate layer
+        model.fc = torch.nn.Sequential(
+            torch.nn.Dropout(p=0.2),                        # Add dropout for regularization
+            torch.nn.Linear(model.fc.in_features, 256),     # Intermediate layer
+            torch.nn.ReLU(),                                # Activation function
+            torch.nn.Dropout(p=0.2),                        # Another dropout layer
+            torch.nn.Linear(256, num_classes)
+        )
+    
+    # Freeze all layers except the classifier
+    for param in model.parameters():
+        param.requires_grad = False
+    for param in model.fc.parameters():
+        param.requires_grad = True
+    
+    return model, "TL_ResNet50D"
+
+def getInceptionV4_model(amount_of_trainable_linear_layers=2):
+
+    # Load the EfficientNet B3 model with pretrained weights
+    model = timm.create_model('inception_v4', pretrained=True)
+    
+    # Modify the classifier for binary classification
+    num_classes = 1  # For binary classification (OK/NOK)
+    if amount_of_trainable_linear_layers == 1:
+        model.last_linear = torch.nn.Linear(model.last_linear.in_features, num_classes)
+    elif amount_of_trainable_linear_layers == 2:
+        model.last_linear = torch.nn.Sequential(
+            torch.nn.Dropout(p=0.2),                                # Add dropout for regularization
+            torch.nn.Linear(model.last_linear.in_features, 256),    # Intermediate layer
+            torch.nn.ReLU(),                                        # Activation function
+            torch.nn.Dropout(p=0.2),                                # Another dropout layer
+            torch.nn.Linear(256, num_classes)
+        )
+    
+    # Freeze all layers except the classifier
+    for param in model.parameters():
+        param.requires_grad = False
+    for param in model.last_linear.parameters():
+        param.requires_grad = True
+    
+    return model, "TL_InceptionV4"
+
+def getConvNextV2_model(amount_of_trainable_linear_layers=2):
+
+    # Load the EfficientNet B3 model with pretrained weights
+    model = timm.create_model('convnextv2_base', pretrained=True)
+    
+    # Modify the classifier for binary classification
+    num_classes = 1  # For binary classification (OK/NOK)
+    if amount_of_trainable_linear_layers == 1:
+        model.head.fc = torch.nn.Linear(model.head.fc.in_features, num_classes)
+    elif amount_of_trainable_linear_layers == 2:
+        model.head.fc = torch.nn.Sequential(
+            torch.nn.Dropout(p=0.2),                                # Add dropout for regularization
+            torch.nn.Linear(model.head.fc.in_features, 256),    # Intermediate layer
+            torch.nn.ReLU(),                                        # Activation function
+            torch.nn.Dropout(p=0.2),                                # Another dropout layer
+            torch.nn.Linear(256, num_classes)
+        )
+    
+    # Freeze all layers except the classifier
+    for param in model.parameters():
+        param.requires_grad = False
+    for param in model.head.fc.parameters():
+        param.requires_grad = True
+    
+    return model, "TL_ConvNextV2_base"
 
 class TransferLearningModule(pl.LightningModule):
     def __init__(self, model, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
@@ -261,3 +373,31 @@ class TransferLearningModule(pl.LightningModule):
         plt.legend()
         plt.title("ROC Curve")
         plt.show()
+
+class TL_ConvNextV2(TransferLearningModule):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR', amount_of_trainable_linear_layers=2):
+        model, model_name = getConvNextV2_model(amount_of_trainable_linear_layers)
+        super().__init__(model, learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.model_name = model_name
+        self.save_hyperparameters()  # Save hyperparameters for logging
+
+class TL_EfficientNetB4(TransferLearningModule):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR', amount_of_trainable_linear_layers=2):
+        model, model_name = getEfficientNetB4_model(amount_of_trainable_linear_layers)
+        super().__init__(model, learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.model_name = model_name
+        self.save_hyperparameters()  # Save hyperparameters for logging
+
+class TL_ResNet152D(TransferLearningModule):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR', amount_of_trainable_linear_layers=2):
+        model, model_name = getResNet152D_model(amount_of_trainable_linear_layers)
+        super().__init__(model, learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.model_name = model_name
+        self.save_hyperparameters()  # Save hyperparameters for logging
+
+class TL_InceptionV4(TransferLearningModule):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR', amount_of_trainable_linear_layers=2):
+        model, model_name = getInceptionV4_model(amount_of_trainable_linear_layers)
+        super().__init__(model, learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.model_name = model_name
+        self.save_hyperparameters()  # Save hyperparameters for logging

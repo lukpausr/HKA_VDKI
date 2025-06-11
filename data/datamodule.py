@@ -174,7 +174,8 @@ class BinaryImageDataModule(pl.LightningDataModule):
             self.train_dataset, 
             batch_size=self.batch_size,
             shuffle=True, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
     def val_dataloader(self):
@@ -182,7 +183,8 @@ class BinaryImageDataModule(pl.LightningDataModule):
             self.val_dataset, 
             batch_size=self.batch_size,
             shuffle=False, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
     def test_dataloader(self):
@@ -190,7 +192,8 @@ class BinaryImageDataModule(pl.LightningDataModule):
             self.test_dataset, 
             batch_size=self.batch_size,
             shuffle=False, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
 class ReducedSizeBinaryImageDataModule(BinaryImageDataModule):
@@ -201,34 +204,6 @@ class ReducedSizeBinaryImageDataModule(BinaryImageDataModule):
         self.train_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/train/', self.transform)
         self.val_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/test/', self.transform)
         self.test_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/val/', self.transform)
-
-if __name__ == "__main__":
-    # # Example usage
-    # data_dir = "path/to/data"
-    # data_module = BinaryImageDataModule(data_dir, batch_size=16)
-    # data_module.setup()
-
-    # train_loader = data_module.train_dataloader()
-    # for images, labels in train_loader:
-    #     print(images.shape, labels.shape)
-    #     break  # Just to demonstrate loading one batch
-
-    import pickle
-    import sys
-
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    from config.load_configuration import load_configuration
-
-    config = load_configuration()
-
-    dm = BinaryImageDataModule(data_dir=config['path_to_split_aug_pics'], batch_size=config['batch_size'], num_workers=0, persistent_workers=True)
-    try:
-        pickle.dumps(dm)
-        print("Pickling succeeded!")
-    except Exception as e:
-        print(f"Pickling failed: {e}")
-
-        
     
 class MultiClassImageDataModule(pl.LightningDataModule):
     def __init__(self, data_dir, name_list, batch_size=32, num_workers=2, transform=None, persistent_workers=True):
@@ -251,7 +226,8 @@ class MultiClassImageDataModule(pl.LightningDataModule):
             self.train_dataset, 
             batch_size=self.batch_size,
             shuffle=True, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
     def val_dataloader(self):
@@ -259,7 +235,8 @@ class MultiClassImageDataModule(pl.LightningDataModule):
             self.val_dataset, 
             batch_size=self.batch_size,
             shuffle=False, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
     def test_dataloader(self):
@@ -267,20 +244,11 @@ class MultiClassImageDataModule(pl.LightningDataModule):
             self.test_dataset, 
             batch_size=self.batch_size,
             shuffle=False, 
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            persistent_workers=self.persistent_workers
         )
 
 if __name__ == "__main__":
-    # # Example usage
-    # data_dir = "path/to/data"
-    # data_module = MultiClassImageDataset(data_dir, batch_size=16)
-    # data_module.setup()
-
-    # train_loader = data_module.train_dataloader()
-    # for images, labels in train_loader:
-    #     print(images.shape, labels.shape)
-    #     break  # Just to demonstrate loading one batch
-
     import pickle
     import sys
 
@@ -295,3 +263,10 @@ if __name__ == "__main__":
         print("Pickling succeeded!")
     except Exception as e:
         print(f"Pickling failed: {e}")
+
+    dm = BinaryImageDataModule(data_dir=config['path_to_split_aug_pics'], batch_size=config['batch_size'], num_workers=0, persistent_workers=True)
+    try:
+        pickle.dumps(dm)
+        print("Pickling succeeded!")
+    except Exception as e:
+        print(f"Pickling failed: {e}")     
