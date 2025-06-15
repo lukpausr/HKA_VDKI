@@ -1,14 +1,13 @@
-# datamodule.py
-
 # required imports
 import os
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
+import sys
+from torchvision import transforms
 
 # from skimage import io, transform
-
-from data.dataset import SmallAnimalsDataset
-from data.dataset import BinaryImageDataset, ReducedSizeBinaryImageDataset, MultiClassImageDataset
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
+from .dataset import SmallAnimalsDataset, BinaryImageDataset, ReducedSizeBinaryImageDataset, MultiClassImageDataset, MultiClassImageDataset_Bunnies
 
 # Custom Data Module for Pytorch Lightning
 # Source: https://pytorch-lightning.readthedocs.io/en/1.1.8/introduction_guide.html#data
@@ -162,7 +161,7 @@ class BinaryImageDataModule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.persistent_workers = persistent_workers
 
-        self.transform = transform if transform is not None else transform.ToTensor()
+        self.transform = transform if transform is not None else transforms.ToTensor()
 
     def setup(self, stage=None):
         self.train_dataset = BinaryImageDataset(self.data_dir + '/train/', self.transform)
@@ -214,12 +213,18 @@ class MultiClassImageDataModule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.persistent_workers = persistent_workers
 
-        self.transform = transform if transform is not None else transform.ToTensor()
+        self.transform = transform if transform is not None else transforms.ToTensor()
 
     def setup(self, stage=None):
+        
         self.train_dataset = MultiClassImageDataset(self.data_dir + '/train/', self.name_list, self.transform)
-        self.val_dataset = MultiClassImageDataset(self.data_dir + '/test/', self.name_list, self.transform)
-        self.test_dataset = MultiClassImageDataset(self.data_dir + '/val/', self.name_list, self.transform)
+        # self.val_dataset = MultiClassImageDataset(self.data_dir + '/val/', self.name_list, self.transform)
+        self.val_dataset = MultiClassImageDataset_Bunnies(r"F:\Users\Mika\Documents\Studium_HKA\Semester2\HKA_VDKI\Mika_Data\xx_ProcessedImagesJanik\ProcessedImagesJanik", self.name_list, self.transform)
+        # self.test_dataset = MultiClassImageDataset(self.data_dir + '/test/', self.name_list, self.transform)
+        self.test_dataset = self.val_dataset
+        # self.train_dataset = MultiClassImageDataset_Bunnies(self.data_dir + '/train/', self.name_list, self.transform)
+        # self.val_dataset = MultiClassImageDataset_Bunnies(self.data_dir + '/val/', self.name_list, self.transform)
+        # self.test_dataset = MultiClassImageDataset_Bunnies(self.data_dir + '/test/', self.name_list, self.transform)
 
     def train_dataloader(self):
         return DataLoader(
@@ -250,23 +255,28 @@ class MultiClassImageDataModule(pl.LightningDataModule):
 
 if __name__ == "__main__":
     import pickle
-    import sys
 
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from config.load_configuration import load_configuration
 
     config = load_configuration()
+    
+    transformation = transforms.Compose([
+        transforms.Resize((300, 300)),  # Resize images to match EfficientNet input size
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Standard ImageNet normalization
+    ])
 
-    dm = MultiClassImageDataset(data_dir=config['path_to_split_aug_pics'], batch_size=config['batch_size'], num_workers=0, persistent_workers=True)
+    dm = MultiClassImageDataModule(data_dir=config['path_to_bunnie_data'], name_list=config['name_list'], batch_size=config['batch_size'], num_workers=0, transform=transformation, persistent_workers=True)
     try:
         pickle.dumps(dm)
         print("Pickling succeeded!")
     except Exception as e:
         print(f"Pickling failed: {e}")
 
-    dm = BinaryImageDataModule(data_dir=config['path_to_split_aug_pics'], batch_size=config['batch_size'], num_workers=0, persistent_workers=True)
-    try:
-        pickle.dumps(dm)
-        print("Pickling succeeded!")
-    except Exception as e:
-        print(f"Pickling failed: {e}")     
+    # dm = BinaryImageDataModule(data_dir=config['path_to_split_aug_pics'], batch_size=config['batch_size'], num_workers=0, transform=transformation, persistent_workers=True)
+    # try:
+    #     pickle.dumps(dm)
+    #     print("Pickling succeeded!")
+    # except Exception as e:
+    #     print(f"Pickling failed: {e}")

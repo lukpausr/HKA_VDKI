@@ -3,7 +3,7 @@ import os
 import hashlib
 from PIL import Image
 import imagehash
-from icrawler.builtin import BingImageCrawler, GoogleImageCrawler
+# from icrawler.builtin import BingImageCrawler, GoogleImageCrawler
 # from google_images_search import GoogleImagesSearch  # Uncomment if using this part
 
 # --- 1. Download images with iCrawler (Bing) ---
@@ -100,7 +100,7 @@ def remove_visual_duplicates(folder, threshold=1):
             else:
                 hashes[h] = name  # only if no confirmed duplicate
 
-    print(f"\n {duplicates} duplicate(s) deleted.")
+    print(f"\n {duplicates} duplicate(s) deleted from {folder}.")
 
 #remove_visual_duplicates("Waschbär", threshold=8)
 
@@ -182,6 +182,7 @@ def rename_images(folder):
     print("All files have been renamed.")
 
 # Example usage:
-rename_images("Ratte")
-
-
+if __name__ == "__main__":
+    print("Please uncomment the function you want to run.")
+    # Uncomment the function you want to run
+    # rename_images("Ratte")

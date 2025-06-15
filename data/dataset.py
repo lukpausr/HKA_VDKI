@@ -152,32 +152,32 @@ class ReducedSizeBinaryImageDataset(BinaryImageDataset):
 
         self.transform = transform
 
-if __name__ == "__main__":
-    import sys
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    from config.load_configuration import load_configuration
+# if __name__ == "__main__":
+#     import sys
+#     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#     from config.load_configuration import load_configuration
 
-    config = load_configuration()
+#     config = load_configuration()
 
-    dataset = BinaryImageDataset(
-        path_to_image_folder=config['path_to_split_aug_pics'] + '/train/',
-        transform=None  # Add any transformations if needed
-    )
+#     dataset = BinaryImageDataset(
+#         path_to_image_folder=config['path_to_split_aug_pics'] + '/train/',
+#         transform=None  # Add any transformations if needed
+#     )
 
-    dataset_size = len(dataset)
-    print(f"Dataset size: {dataset_size}")
+#     dataset_size = len(dataset)
+#     print(f"Dataset size: {dataset_size}")
 
-    # Example of getting an item
-    for i in range(5):  # Print first 5 items
-        image, label = dataset[i]
-        print(f"Image {i}: {image.size}, Label: {label}")
+#     # Example of getting an item
+#     for i in range(5):  # Print first 5 items
+#         image, label = dataset[i]
+#         print(f"Image {i}: {image.size}, Label: {label}")
 
-        import matplotlib.pyplot as plt
+#         import matplotlib.pyplot as plt
 
-        plt.imshow(image)
-        plt.title(f"Label: {label}")
-        plt.axis('off')
-        plt.show()
+#         plt.imshow(image)
+#         plt.title(f"Label: {label}")
+#         plt.axis('off')
+#         plt.show()
 
 
 class MultiClassImageDataset(torch.utils.data.Dataset):
@@ -210,13 +210,14 @@ class MultiClassImageDataset(torch.utils.data.Dataset):
         image = Image.open(img_path).convert("RGB")
 
         # Apply lower() and split('.')[0] to all elements in name_list
-        self.name_list = [name.lower().split('.')[0] for name in self.name_list]
+        self.name_list = [name.lower() for name in self.name_list]
 
         # Check if idx is a tensor and convert to list if necessary
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
         # Label is 1 if filename ends with '_ok', 0 if ends with '_nok'
+        
         basename = os.path.basename(img_path)
         basename = basename.lower().split('_')[0]
         # print(f"Processing file: {basename}")
@@ -233,29 +234,88 @@ class MultiClassImageDataset(torch.utils.data.Dataset):
 
         return image, torch.tensor(label, dtype=torch.float32)
     
+class MultiClassImageDataset_Bunnies(torch.utils.data.Dataset):
+    """
+    PyTorch Dataset for multiclass classification of bunny images.
+    Expects a directory structure:
+        root/
+            Apollo/
+            Aster/
+            Helios/
+            Nyx/
+            other/
+            Selene/
+    Each subfolder contains images of that class. The folder name is the label.
+    Args:
+        root_dir (str): Path to the root directory (e.g., 'Train', 'Test', or 'Val').
+        class_names (list): List of class names (folder names).
+        transform (callable, optional): Optional transform to be applied on an image.
+    """
+    def __init__(self, root_dir, class_names, transform=None):
+        self.root_dir = root_dir
+        self.class_names = class_names
+        self.transform = transform
+
+        self.samples = []
+        for idx, class_name in enumerate(self.class_names):
+            class_folder = os.path.join(self.root_dir, class_name)
+            if not os.path.isdir(class_folder):
+                continue
+            for fname in os.listdir(class_folder):
+                if fname.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    label = [0] * len(self.class_names)
+                    label[idx] = 1.0
+                    self.samples.append((os.path.join(class_folder, fname), torch.tensor(label, dtype=torch.float32)))
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        img_path, label = self.samples[idx]
+        image = Image.open(img_path).convert("RGB")
+        if self.transform:
+            image = self.transform(image)
+        return image, label
+    
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from config.load_configuration import load_configuration
+    import random
+    from collections import Counter
 
     config = load_configuration()
 
-    dataset = BinaryImageDataset(
-        path_to_image_folder=config['path_to_split_aug_pics'] + '/train/',
-        transform=None  # Add any transformations if needed
-    )
+    # dataset = MultiClassImageDataset_Bunnies(
+    #     root_dir=config['path_to_bunnie_data'],
+    #     transform=None,
+    #     class_names=['Apollo', 'Aster', 'Helios', 'Nyx', 'other', 'Selene']
+    # )
 
-    dataset_size = len(dataset)
-    print(f"Dataset size: {dataset_size}")
+    # dataset_size = len(dataset)
+    # print(f"Dataset size: {dataset_size}")
+    # random.shuffle(dataset.samples)
+    # label_counts = Counter([label for _, label in dataset.samples])
+    # for class_idx, count in label_counts.items():
+    #     class_name = dataset.class_names[class_idx]
+    #     print(f"Class '{class_name}': {count} samples")
+    # # Example of getting an item
+    # for i in range(5):  # Print first 5 items
+    #     image, label = dataset[i]
+    #     print(f"Image {i}: {image.size}, Label: {label}")
 
-    # Example of getting an item
-    for i in range(5):  # Print first 5 items
-        image, label = dataset[i]
-        print(f"Image {i}: {image.size}, Label: {label}")
+    #     # import matplotlib.pyplot as plt
 
-        import matplotlib.pyplot as plt
+    #     # plt.imshow(image)
+    #     # plt.title(f"Label: {label}")
+    #     # plt.axis('off')
+    #     # plt.show()
 
-        plt.imshow(image)
-        plt.title(f"Label: {label}")
-        plt.axis('off')
-        plt.show()
+
+    # dataset = MultiClassImageDataset(
+    #     path_to_image_folder=config['path_to_bunnie_data'],
+    #     transform=None,
+    #     name_list=['Apollo', 'Aster', 'Helios', 'Nyx', 'other', 'Selene']
+    # )
+    # print(dataset.name_list)
+    # print([name.lower().split('.')[0] for name in dataset.name_list])

@@ -1,6 +1,6 @@
 import torch
 import pytorch_lightning as pl
-
+import timm
 import wandb
 
 import numpy as np
@@ -11,6 +11,63 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from torchmetrics.classification import MulticlassAccuracy, MulticlassPrecision, MulticlassRecall
 
 # from .model_transferlearning import TransferLearningModule
+
+def getEfficientNetB4_model(amount_of_trainable_linear_layers=1, num_classes=6):
+    """
+    Function to get the EfficientNet B4 model with pretrained weights.
+    Returns:
+        model: A PyTorch model instance of EfficientNet B4.
+    """
+    # Load the EfficientNet B4 model with pretrained weights
+    model = timm.create_model('efficientnet_b4', pretrained=True)
+    
+    # Modify the classifier for binary classification
+    # num_classes = len(config['name_list'])
+    num_classes = 6
+    if amount_of_trainable_linear_layers == 1:
+        model.classifier = torch.nn.Linear(model.classifier.in_features, num_classes)
+    elif amount_of_trainable_linear_layers == 2:
+        # If two linear layers are trainable, we add an intermediate layer
+        model.classifier = torch.nn.Sequential(
+            torch.nn.Dropout(p=0.2),  # Add dropout for regularization
+            torch.nn.Linear(model.classifier.in_features, 256),  # Intermediate layer
+            torch.nn.ReLU(),  # Activation function
+            torch.nn.Dropout(p=0.2),  # Another dropout layer
+            torch.nn.Linear(256, num_classes)
+        )
+    
+    # Freeze all layers except the classifier
+    for param in model.parameters():
+        param.requires_grad = False
+    for param in model.classifier.parameters():
+        param.requires_grad = True
+    
+    return model, "TL_EfficientNetB4"
+
+def getConvNextV2_model(amount_of_trainable_linear_layers=1, num_classes=6):
+
+    # Load the EfficientNet B3 model with pretrained weights
+    model = timm.create_model('convnextv2_base', pretrained=True)
+    
+    # Modify the classifier for binary classification
+    if amount_of_trainable_linear_layers == 1:
+        model.head.fc = torch.nn.Linear(model.head.fc.in_features, num_classes)
+    elif amount_of_trainable_linear_layers == 2:
+        model.head.fc = torch.nn.Sequential(
+            torch.nn.Dropout(p=0.2),                                # Add dropout for regularization
+            torch.nn.Linear(model.head.fc.in_features, 256),    # Intermediate layer
+            torch.nn.ReLU(),                                        # Activation function
+            torch.nn.Dropout(p=0.2),                                # Another dropout layer
+            torch.nn.Linear(256, num_classes)
+        )
+    
+    # Freeze all layers except the classifier
+    for param in model.parameters():
+        param.requires_grad = False
+    for param in model.head.fc.parameters():
+        param.requires_grad = True
+    
+    return model, "TL_ConvNextV2_base"
 
 class TransferLearningModuleMulticlass(pl.LightningModule):
     def __init__(self, model, num_classes, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
@@ -24,6 +81,8 @@ class TransferLearningModuleMulticlass(pl.LightningModule):
         self.num_classes = num_classes
         self.criterion = torch.nn.CrossEntropyLoss()
         self.softmax = torch.nn.Softmax(dim=1)
+
+        self.save_hyperparameters(ignore=['model'])
 
         self.train_accuracy = MulticlassAccuracy(num_classes=num_classes, average='macro')
         self.val_accuracy = MulticlassAccuracy(num_classes=num_classes, average='macro')
@@ -146,3 +205,17 @@ class TransferLearningModuleMulticlass(pl.LightningModule):
         cm = confusion_matrix(targets, preds)
         disp = ConfusionMatrixDisplay(cm)
         disp.plot()
+
+class TL_ConvNextV2(TransferLearningModuleMulticlass):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR', amount_of_trainable_linear_layers=1, num_classes=6):
+        model, model_name = getConvNextV2_model(amount_of_trainable_linear_layers, num_classes)
+        super().__init__(model, num_classes, learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.model_name = model_name
+        self.save_hyperparameters()  # Save hyperparameters for logging
+
+class TL_EfficientNetB4(TransferLearningModuleMulticlass):
+    def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR', amount_of_trainable_linear_layers=1, num_classes=6):
+        model, model_name = getEfficientNetB4_model(amount_of_trainable_linear_layers, num_classes)
+        super().__init__(model, num_classes, learning_rate, optimizer_name, weight_decay, scheduler_name)
+        self.model_name = model_name
+        self.save_hyperparameters()  # Save hyperparameters for logging
