@@ -286,7 +286,7 @@ class CnnOptunaTrainer(OptunaTrainer):
         # Suggest hyperparameters
         self.config['batch_size'] = trial.suggest_categorical("batch_size", [32, 64, 128])
         # If not able to use variable image size, set image size to fixed value
-        self.config['image_size'] = trial.suggest_categorical("image_size", [128])          
+        self.config['image_size'] = trial.suggest_categorical("image_size", [128, 192, 224])          
         self.config['max_epochs'] = trial.suggest_int("max_epochs", 20, 40)
         self.config['accumulate_grad_batches'] = trial.suggest_categorical("accumulate_grad_batches", [1, 2, 4])
         self.config['precision'] = trial.suggest_categorical("precision", ["16-mixed", 32])
@@ -306,7 +306,7 @@ class CnnOptunaTrainer(OptunaTrainer):
             data_dir=self.config['path_to_split_aug_pics'],
             transform=transform,
             batch_size=self.config['batch_size'],
-            num_workers=2,
+            num_workers=6,
             persistent_workers=True
         )
 
