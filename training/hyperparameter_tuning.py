@@ -129,8 +129,8 @@ class TLOptunaTrainer(OptunaTrainer):
         """
         # Suggest hyperparameters
         self.config['batch_size'] = trial.suggest_categorical("batch_size", [32, 64, 128])
-        # self.config['image_size'] = trial.suggest_categorical("image_size", [300])
-        self.config['image_size'] = self.config['image_size']
+        self.config['image_size'] = trial.suggest_categorical("image_size", [192, 224, 256])  # If not able to use variable image size, set image size to fixed value
+        # self.config['image_size'] = self.config['image_size']
 
         self.config['max_epochs'] = trial.suggest_int("max_epochs", 20, 40)
         self.config['accumulate_grad_batches'] = trial.suggest_categorical("accumulate_grad_batches", [1, 2, 4])
@@ -150,7 +150,7 @@ class TLOptunaTrainer(OptunaTrainer):
             data_dir=self.config['path_to_split_aug_pics'],
             transform=transform,
             batch_size=self.config['batch_size'],
-            num_workers=2,
+            num_workers=6,
             persistent_workers=True
         )
 
@@ -228,6 +228,7 @@ class CnnOptunaTrainer(OptunaTrainer):
                 custom_transforms.CenterCropSquare(),
                 v2.Resize((image_size, image_size)),
                 v2.ToTensor(),
+                v2.Normalize(mean=self.normalize_mean, std=self.normalize_std)
             ])
         
     def _setup_wandb_logger(self):
@@ -284,7 +285,7 @@ class CnnOptunaTrainer(OptunaTrainer):
             float: The validation loss after training, or float("inf") if training failed.
         """
         # Suggest hyperparameters
-        self.config['batch_size'] = trial.suggest_categorical("batch_size", [32, 64, 128])
+        self.config['batch_size'] = trial.suggest_categorical("batch_size", [16, 32, 48])
         # If not able to use variable image size, set image size to fixed value
         self.config['image_size'] = trial.suggest_categorical("image_size", [128, 192, 224])          
         self.config['max_epochs'] = trial.suggest_int("max_epochs", 20, 40)
