@@ -129,7 +129,7 @@ class TLOptunaTrainer(OptunaTrainer):
         """
         # Suggest hyperparameters
         self.config['batch_size'] = trial.suggest_categorical("batch_size", [32, 64, 128])
-        self.config['image_size'] = trial.suggest_categorical("image_size", [192, 224, 256])  # If not able to use variable image size, set image size to fixed value
+        self.config['image_size'] = trial.suggest_categorical("image_size", [192, 256, 380])  # If not able to use variable image size, set image size to fixed value
         # self.config['image_size'] = self.config['image_size']
 
         self.config['max_epochs'] = trial.suggest_int("max_epochs", 20, 40)
