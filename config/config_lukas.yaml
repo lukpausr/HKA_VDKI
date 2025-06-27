@@ -14,7 +14,7 @@ path_to_split_raw_pics: C:\Users\lukas\SynologyDrive_IMS\SS25_MSYS_KAER-AI-PoseA
 
 # WandB configuration
 wandb_entity: VDKI-Hasen
-wandb_project_name: VDKI-Hasen_TransferLearning
+wandb_project_name: VDKI-Hasen_Hyperparameter_Tuning_TL_ConvNext
 # wandb_project_name: VDKI-Hasen_Hyperparameter_Tuning_V3
 
 # Hyperparameter tuning using Optuna
