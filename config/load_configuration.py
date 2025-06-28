@@ -23,7 +23,7 @@ def load_configuration():
             config_path = "config/config_mika.yaml"
         elif pc_name == 'MacBook-Pro-de-Marie-7.local':
             config_path = "config/config_marie.yaml"
-        elif pc_name == 'DESKTOP-BLKLC13':
+        elif pc_name == 'luka-IdeaPad-Pro-5-14AHP9':
             config_path = "config/config_luka.yaml"
         else:
             config_path = "config/config_mika.yaml"
@@ -41,7 +41,7 @@ def load_configuration():
             config_path = "../config/config_mika.yaml"
         elif pc_name == 'MacBook-Pro-de-Marie-7.local':
             config_path = "config/config_marie.yaml"
-        elif pc_name == 'DESKTOP-BLKLC13':
+        elif pc_name == 'luka-IdeaPad-Pro-5-14AHP9':
             config_path = "../config/config_luka.yaml"
         else:
             config_path = "../config/config_mika.yaml"
