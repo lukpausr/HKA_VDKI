@@ -12,9 +12,15 @@ path_to_raw_pics: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_
 path_to_split_aug_pics: C:\Users\lukas\SynologyDrive_IMS\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe1_aug
 path_to_split_raw_pics: C:\Users\lukas\SynologyDrive_IMS\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe1_raw
 
+# Multiclass classification dataset paths
+path_to_bunnie_data: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_cropped_raw
+path_to_bunnie_data_aug: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_aug
+name_list: [other, apollo,  aster, helios, nyx, selene]
+trainable_linear_layers: 1
+
 # WandB configuration
 wandb_entity: VDKI-Hasen
-wandb_project_name: VDKI-Hasen_Hyperparameter_Tuning_TL_ConvNext
+wandb_project_name: VDKI-Hasen_Hyperparameter_Tuning_FD_ConvNext
 # wandb_project_name: VDKI-Hasen_Hyperparameter_Tuning_V3
 
 # Hyperparameter tuning using Optuna

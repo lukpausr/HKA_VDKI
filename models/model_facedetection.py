@@ -23,7 +23,7 @@ def getEfficientNetB4_model(amount_of_trainable_linear_layers=1, num_classes=6):
     
     # Modify the classifier for binary classification
     # num_classes = len(config['name_list'])
-    num_classes = 6
+    # num_classes = 6
     if amount_of_trainable_linear_layers == 1:
         model.classifier = torch.nn.Linear(model.classifier.in_features, num_classes)
     elif amount_of_trainable_linear_layers == 2:
@@ -42,7 +42,7 @@ def getEfficientNetB4_model(amount_of_trainable_linear_layers=1, num_classes=6):
     for param in model.classifier.parameters():
         param.requires_grad = True
     
-    return model, "TL_EfficientNetB4"
+    return model, "FD_EfficientNetB4"
 
 def getConvNextV2_model(amount_of_trainable_linear_layers=1, num_classes=6):
 
@@ -67,7 +67,7 @@ def getConvNextV2_model(amount_of_trainable_linear_layers=1, num_classes=6):
     for param in model.head.fc.parameters():
         param.requires_grad = True
     
-    return model, "TL_ConvNextV2_base"
+    return model, "FDund ve_ConvNextV2_base"
 
 class TransferLearningModuleMulticlass(pl.LightningModule):
     def __init__(self, model, num_classes, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
@@ -101,18 +101,39 @@ class TransferLearningModuleMulticlass(pl.LightningModule):
         return self.model(x)
 
     def configure_optimizers(self):
-        if self.optimizer_name == 'Adam':
-            optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
-        elif self.optimizer_name == 'SGD':
-            optimizer = torch.optim.SGD(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
-        else:
-            raise ValueError(f"Unsupported optimizer: {self.optimizer_name}")
+        """
+        Configures and returns the optimizer for training the model.
 
-        if self.scheduler_name == 'StepLR':
-            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+        Returns:
+            torch.optim.Optimizer: An Adam optimizer initialized with the model's parameters and the specified learning rate.
+        """
+        if self.optimizer_name == "Adam":
+            optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+        elif self.optimizer_name == "SGD":
+            optimizer = torch.optim.SGD(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, momentum=0.9)
+        elif self.optimizer_name == "AdamW":
+            optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+
+        if self.scheduler_name == "StepLR":
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+            return [optimizer], [scheduler]
+        elif self.scheduler_name == "CosineAnnealingLR":
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=self.trainer.max_epochs)
             return [optimizer], [scheduler]
         else:
             return optimizer
+        # if self.optimizer_name == 'Adam':
+        #     optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+        # elif self.optimizer_name == 'SGD':
+        #     optimizer = torch.optim.SGD(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+        # else:
+        #     raise ValueError(f"Unsupported optimizer: {self.optimizer_name}")
+
+        # if self.scheduler_name == 'StepLR':
+        #     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+        #     return [optimizer], [scheduler]
+        # else:
+        #     return optimizer
 
     def training_step(self, batch, batch_idx):
         x, y = batch
