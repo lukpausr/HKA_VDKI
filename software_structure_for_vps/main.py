@@ -23,6 +23,7 @@ from data.custom_transforms import CenterCropSquare
 from models.model_facedetection import FD_ConvNextV2
 from models.model_transferlearning import TL_ConvNextV2
 class RabbitRecognitionSystem:
+    
     class Zustand:
         INITIALISIERUNG = "INITIALISIERUNG"
         BEREIT = "BEREIT"
