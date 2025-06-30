@@ -6,11 +6,12 @@ path_to_val_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Val_Da
 path_to_raw_pics: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/data_scraper/Google-Image-Scraper/Bilder_Marie
 path_to_split_aug_pics: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Datasets_aug
 
-path_to_bunnie_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_cropped_raw
-path_to_bunnie_data_aug: F:\Users\Mika\Documents\Studium_HKA\Semester2\HKA_VDKI\Mika_Data\dataset_aufgabe2_aug
+# path_to_bunnie_data: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_cropped_raw
+path_to_bunnie_data: D:\HKA_IMS_Drive\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe2_cropped_wo_duplicates
+path_to_bunnie_data_aug: D:\HKA_IMS_Drive\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe2_aug
 
 path_to_models: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/
-path_to_model: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/TL_EfficientNetB4_model_20250613_112821.ckpt
+path_to_model: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/TL_ConvNextV2_base_model_20250628_164550.ckpt
 
 wandb_entity: VDKI-Hasen
 wandb_project_name: VDKI-Hasen
