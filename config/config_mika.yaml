@@ -11,7 +11,7 @@ path_to_bunnie_data: D:\HKA_IMS_Drive\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dat
 path_to_bunnie_data_aug: D:\HKA_IMS_Drive\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe2_aug
 
 path_to_models: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/
-path_to_model: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/TL_ConvNextV2_base_model_20250628_164550.ckpt
+path_to_model: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/selected_models/TL_ConvNextV2_base_cls2_bs32_img300_optAdamW_lr3e-04_wd1e-02_sch_CosineAnnealingLR_2025-06-29_20-03.ckpt
 
 wandb_entity: VDKI-Hasen
 wandb_project_name: VDKI-Hasen
