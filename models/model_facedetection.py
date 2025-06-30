@@ -67,7 +67,7 @@ def getConvNextV2_model(amount_of_trainable_linear_layers=1, num_classes=6):
     for param in model.head.fc.parameters():
         param.requires_grad = True
     
-    return model, "FDund ve_ConvNextV2_base"
+    return model, "FD_ConvNextV2_base"
 
 class TransferLearningModuleMulticlass(pl.LightningModule):
     def __init__(self, model, num_classes, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
