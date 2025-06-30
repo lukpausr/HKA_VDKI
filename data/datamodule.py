@@ -164,9 +164,16 @@ class BinaryImageDataModule(pl.LightningDataModule):
         self.transform = transform if transform is not None else transforms.ToTensor()
 
     def setup(self, stage=None):
-        self.train_dataset = BinaryImageDataset(self.data_dir + '/train/', self.transform)
-        self.val_dataset = BinaryImageDataset(self.data_dir + '/test/', self.transform)
-        self.test_dataset = BinaryImageDataset(self.data_dir + '/val/', self.transform)
+
+        if(stage is None):
+            self.train_dataset = BinaryImageDataset(self.data_dir + '/train/', self.transform)
+            self.val_dataset = BinaryImageDataset(self.data_dir + '/val/', self.transform)
+            self.test_dataset = BinaryImageDataset(self.data_dir + '/test/', self.transform)
+        elif(stage == 'fit'):
+            self.train_dataset = BinaryImageDataset(self.data_dir + '/train/', self.transform)
+            self.val_dataset = BinaryImageDataset(self.data_dir + '/val/', self.transform)
+        elif(stage == 'test'):
+            self.test_dataset = BinaryImageDataset(self.data_dir + '/test/', self.transform)
 
     def train_dataloader(self):
         return DataLoader(
@@ -200,9 +207,16 @@ class ReducedSizeBinaryImageDataModule(BinaryImageDataModule):
         super().__init__(data_dir, batch_size, num_workers, transform, persistent_workers)
 
     def setup(self, stage=None):
-        self.train_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/train/', self.transform)
-        self.val_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/test/', self.transform)
-        self.test_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/val/', self.transform)
+
+        if(stage is None):
+            self.train_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/train/', self.transform)
+            self.val_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/val/', self.transform)
+            self.test_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/test/', self.transform)
+        elif(stage == 'fit'):
+            self.train_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/train/', self.transform)
+            self.val_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/val/', self.transform)
+        elif(stage == 'test'):
+            self.test_dataset = ReducedSizeBinaryImageDataset(self.data_dir + '/test/', self.transform)
     
 class MultiClassImageDataModule(pl.LightningDataModule):
     def __init__(self, data_dir, name_list, batch_size=32, num_workers=2, transform=None, persistent_workers=True):
@@ -217,9 +231,15 @@ class MultiClassImageDataModule(pl.LightningDataModule):
 
     def setup(self, stage=None):
         
-        self.train_dataset = MultiClassImageDataset(self.data_dir + '/train/', self.name_list, self.transform)
-        self.val_dataset = MultiClassImageDataset(self.data_dir + '/val/', self.name_list, self.transform)
-        self.test_dataset = MultiClassImageDataset(self.data_dir + '/test/', self.name_list, self.transform)
+        if(stage is None):
+            self.train_dataset = MultiClassImageDataset(self.data_dir + '/train/', self.name_list, self.transform)
+            self.val_dataset = MultiClassImageDataset(self.data_dir + '/val/', self.name_list, self.transform)
+            self.test_dataset = MultiClassImageDataset(self.data_dir + '/test/', self.name_list, self.transform)
+        elif(stage == 'fit'):
+            self.train_dataset = MultiClassImageDataset(self.data_dir + '/train/', self.name_list, self.transform)
+            self.val_dataset = MultiClassImageDataset(self.data_dir + '/val/', self.name_list, self.transform)
+        elif(stage == 'test'):
+            self.test_dataset = MultiClassImageDataset(self.data_dir + '/test/', self.name_list, self.transform)
 
         # self.val_dataset = MultiClassImageDataset_Bunnies(r"F:\Users\Mika\Documents\Studium_HKA\Semester2\HKA_VDKI\Mika_Data\xx_ProcessedImagesJanik\ProcessedImagesJanik", self.name_list, self.transform)
         # self.test_dataset = self.val_dataset
