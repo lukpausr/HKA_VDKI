@@ -218,10 +218,11 @@ class MultiClassImageDataModule(pl.LightningDataModule):
     def setup(self, stage=None):
         
         self.train_dataset = MultiClassImageDataset(self.data_dir + '/train/', self.name_list, self.transform)
-        # self.val_dataset = MultiClassImageDataset(self.data_dir + '/val/', self.name_list, self.transform)
-        self.val_dataset = MultiClassImageDataset_Bunnies(r"F:\Users\Mika\Documents\Studium_HKA\Semester2\HKA_VDKI\Mika_Data\xx_ProcessedImagesJanik\ProcessedImagesJanik", self.name_list, self.transform)
-        # self.test_dataset = MultiClassImageDataset(self.data_dir + '/test/', self.name_list, self.transform)
-        self.test_dataset = self.val_dataset
+        self.val_dataset = MultiClassImageDataset(self.data_dir + '/val/', self.name_list, self.transform)
+        self.test_dataset = MultiClassImageDataset(self.data_dir + '/test/', self.name_list, self.transform)
+
+        # self.val_dataset = MultiClassImageDataset_Bunnies(r"F:\Users\Mika\Documents\Studium_HKA\Semester2\HKA_VDKI\Mika_Data\xx_ProcessedImagesJanik\ProcessedImagesJanik", self.name_list, self.transform)
+        # self.test_dataset = self.val_dataset
         # self.train_dataset = MultiClassImageDataset_Bunnies(self.data_dir + '/train/', self.name_list, self.transform)
         # self.val_dataset = MultiClassImageDataset_Bunnies(self.data_dir + '/val/', self.name_list, self.transform)
         # self.test_dataset = MultiClassImageDataset_Bunnies(self.data_dir + '/test/', self.name_list, self.transform)
