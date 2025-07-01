@@ -13,6 +13,10 @@ path_to_bunnie_data_aug: D:\HKA_IMS_Drive\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data
 path_to_models: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/
 path_to_model: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/selected_models/TL_ConvNextV2_base_cls2_bs32_img300_optAdamW_lr3e-04_wd1e-02_sch_CosineAnnealingLR_2025-06-29_20-03.ckpt
 
+# FOLDERS FOR EXAM
+path_to_exam_data_a1: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe1_aug  # replace with dataset_aufgabe1_Pruefung
+path_to_exam_data_a2: D:/HKA_IMS_Drive/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_aug  # replace with dataset_aufgabe2_Pruefung
+
 wandb_entity: VDKI-Hasen
 wandb_project_name: VDKI-Hasen
 wandb_experiment_name: Face_Recognition_EfficientNetB4
