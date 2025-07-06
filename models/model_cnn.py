@@ -420,7 +420,7 @@ class KaninchenModelResidual(CnnModel):
             nn.ReLU(inplace=True),
             )
 
-        self.layer1 = conv_block(64, 128)              # Input: (3, 128, 128) # -> Output: (64, 64, 64)
+        self.layer1 = conv_block(64, 128)              # Input: (64, 128, 128) # -> Output: (128, 64, 64)
         self.layer2 = conv_block(128, 128)             # Output: (128, 32, 32)
         self.layer3 = conv_block(128, 256)             # Output: (256, 16, 16)
         self.layer4 = ResidualBlock(256, 256, downsample=True)       # Output: (256, 8, 8)
@@ -471,12 +471,12 @@ class KaninchenModel_v1(CnnModel):
             nn.SiLU(inplace=True),
             )
 
-        self.layer1 = conv_block(64, 128)              # Input: (64, 128, 128) # -> Output: (64, 64, 64)
+        self.layer1 = conv_block(64, 128)              # Input: (64, 128, 128) # -> Output: (128, 64, 64)
         self.layer2 = conv_block(128, 128)             # Output: (128, 32, 32)
         self.layer3 = conv_block(128, 256)             # Output: (256, 16, 16)
         self.layer4 = ResidualBlock(256, 256, downsample=True)       # Output: (256, 8, 8)
 
-        self.flatten = nn.Flatten()
+        self.flatten = nn.Flatten() # Output: (256*8*8)
         self.fc = nn.Linear(256*8*8, 1)  # Binary classification
 
     def forward(self, x):
@@ -540,7 +540,7 @@ class KaninchenModel_v2(CnnModel):
         x = self.fc(x)
         return x
     
-# linear layers added
+# linear layers added and AdaptiveAvgPool2d
 class KaninchenModel_v3(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -678,12 +678,10 @@ class KaninchenModel_v5(CnnModel):
         return x
     
 
-'''GEN2: v6, v7, v8, v9, v10'''
-'''''
-'''''
+######## GEN 2 ########
 
 
-# out_channels + linear layers
+# out_channels added, linear layers added and AdaptiveAvgPool2d
 class KaninchenModel_v6(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -710,7 +708,6 @@ class KaninchenModel_v6(CnnModel):
         self.layer2 = conv_block(128, 256)
         self.layer3 = conv_block(256, 256)  
         self.layer4 = conv_block(256, 512)  
-        self.layer5 = ResidualBlock(512, 512, downsample=True)  
 
         self.pool = nn.AdaptiveAvgPool2d((1, 1))
         self.flatten = nn.Flatten()
@@ -738,7 +735,7 @@ class KaninchenModel_v6(CnnModel):
         return x
 
 
-# out_channels + linear layers
+# out_channels added and linear layers added
 class KaninchenModel_v7(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -856,7 +853,7 @@ class KaninchenModel_v8(CnnModel):
     
 
 
-# linear layers + dropout + SiLu
+# linear layers added, SilU and dropout 
 class KaninchenModel_v9(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -941,7 +938,7 @@ class KaninchenModel_v10(CnnModel):
         self.block3 = ds_conv_block(256, 512)  
         self.block4 = ds_conv_block(512, 512)  
 
-        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # -> (512,1,1)
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  
         self.classifier = nn.Sequential(
             nn.Flatten(),
             nn.Linear(512, 1)
@@ -957,11 +954,9 @@ class KaninchenModel_v10(CnnModel):
         return x
     
 
-'''GEN3: v11, v12, v13, v14, v15'''
-'''''
-'''''
+######## GEN 3 ########
 
-# v5(dropout and AdaptiveAvgPool2d) + out_channels + dense block 3 steps
+# v5(dropout and AdaptiveAvgPool2d) + out_channels + linear layers
 class KaninchenModel_v11(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -971,12 +966,9 @@ class KaninchenModel_v11(CnnModel):
         def ds_conv_block(in_channels, out_channels, downsample=True):
             stride = 2 if downsample else 1
             return nn.Sequential(
-                # Depthwise
                 nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, stride=stride, groups=in_channels, bias=False),
                 nn.BatchNorm2d(in_channels),
                 nn.ReLU(inplace=True),
-
-                # Pointwise
                 nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
                 nn.BatchNorm2d(out_channels),
                 nn.ReLU(inplace=True),
@@ -1018,7 +1010,7 @@ class KaninchenModel_v11(CnnModel):
         return x
     
 
-# linear layers
+# linear layers and AdaptiveAvgPool2d
 class KaninchenModel_v12(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -1193,7 +1185,7 @@ class KaninchenModel_v14(CnnModel):
         return x
 
 
-#v14(out_channels + linear layers + conv_block(512,512)) + conv_block(512,1024) + conv_block(1024,1024)
+#v7(out_channels + linear layers) + conv_block(512,1024) + conv_block(1024,1024) + AdaptiveAvgPool2d
 class KaninchenModel_v15(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -1257,7 +1249,7 @@ class KaninchenModel_v15(CnnModel):
         return x
 
 
-# v7(out_channels + linear layers) + conv_block(64, 128)
+# v14(linear layers + conv_block(512,512)) + conv_block(64, 128) + AdaptiveAvgPool2d
 class KaninchenModel_v16(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -1316,7 +1308,7 @@ class KaninchenModel_v16(CnnModel):
         return x
 
 
-# v7(out_channels + linear layers) + ResidualBlock(512, 512, downsample=True) 
+# out_channels + linear layers + AdaptiveAvgPool2d
 class KaninchenModel_v17(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -1375,7 +1367,7 @@ class KaninchenModel_v17(CnnModel):
         return x
 
 
-# dense block
+# dense block + AdaptativeAvgPool2d 
 class KaninchenModel_v18(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -1400,7 +1392,6 @@ class KaninchenModel_v18(CnnModel):
 
         self.layer1 = conv_block(64, 128)  
 
-        # Inline DenseBlock: 4 layers, growth_rate = 32, in_channels = 128
         self.dense_layers = nn.ModuleList()
         self.num_dense_layers = 4
         self.growth_rate = 32
@@ -1455,7 +1446,7 @@ class KaninchenModel_v18(CnnModel):
         return x
 
 
-# kernel_size=7
+# v3 mit kernel_size=7
 class KaninchenModel_v19(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -1508,7 +1499,7 @@ class KaninchenModel_v19(CnnModel):
         return x
 
 
-# kernel_size=5
+# v9 kernel_size=5
 class KaninchenModel_v20(CnnModel):
     def __init__(self, learning_rate=1e-3, optimizer_name='Adam', weight_decay=0.0, scheduler_name='StepLR'):
         super().__init__(learning_rate, optimizer_name, weight_decay, scheduler_name)
@@ -1531,12 +1522,12 @@ class KaninchenModel_v20(CnnModel):
             nn.SiLU(inplace=True),
         )
 
-        self.layer1 = ResidualBlock(64, 128)              # (64, 128,128) -> (128, 64,64)
-        self.layer2 = ResidualBlock(128, 128)             # (128, 64,64) -> (128, 32,32)
-        self.layer3 = ResidualBlock(128, 256)             # (128, 32,32) -> (256, 16,16)
-        self.layer4 = ResidualBlock(256, 256, downsample=True)   # (256, 16,16) -> (256, 8,8)
+        self.layer1 = ResidualBlock(64, 128)             
+        self.layer2 = ResidualBlock(128, 128)          
+        self.layer3 = ResidualBlock(128, 256)           
+        self.layer4 = ResidualBlock(256, 256, downsample=True)   
 
-        self.pool = nn.AdaptiveAvgPool2d((1, 1))  # (256, 1, 1) 
+        self.pool = nn.AdaptiveAvgPool2d((1, 1)) 
         self.flatten = nn.Flatten()
 
         self.fc1 = nn.Linear(256, 128)        
