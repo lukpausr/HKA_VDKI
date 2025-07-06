@@ -25,6 +25,8 @@ def load_configuration():
             config_path = "config/config_marie.yaml"
         elif pc_name == 'luka-IdeaPad-Pro-5-14AHP9':
             config_path = "config/config_luka.yaml"
+        elif pc_name == 'LAPTOP-PLZ':
+            config_path = "config/config_lukas_laptop.yaml"
         else:
             config_path = "config/config_mika.yaml"
 
@@ -43,6 +45,8 @@ def load_configuration():
             config_path = "config/config_marie.yaml"
         elif pc_name == 'luka-IdeaPad-Pro-5-14AHP9':
             config_path = "../config/config_luka.yaml"
+        elif pc_name == 'LAPTOP-PLZ':
+            config_path = "../config/config_lukas_laptop.yaml"
         else:
             config_path = "../config/config_mika.yaml"
 

@@ -1,0 +1,38 @@
+path_to_data: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data
+path_to_models: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/
+path_to_model: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Models/CNN/catsdogs_model_20250519_213605.ckpt
+
+path_to_test_data: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Test_Dataset
+path_to_train_data: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Train_Dataset
+path_to_val_data: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/Val_Dataset
+
+path_to_raw_pics: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/data_scraper/Google-Image-Scraper/Bilder_Marie
+
+# Here the augmented images are stored
+path_to_split_aug_pics: C:\Users\Lukas Pelz\HKA-IMS\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe1_aug
+path_to_split_raw_pics: C:\Users\Lukas Pelz\HKA-IMS\SS25_MSYS_KAER-AI-PoseAct\21_Test_Data\dataset_aufgabe1_raw
+
+# Multiclass classification dataset paths
+path_to_bunnie_data: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_cropped_raw
+path_to_bunnie_data_aug: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_aug
+name_list: [other, apollo,  aster, helios, nyx, selene]
+trainable_linear_layers: 1
+
+# FOLDERS FOR EXAM
+path_to_exam_data_a1: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe1_aug  # replace with dataset_aufgabe1_Pruefung
+path_to_exam_data_a2: C:\Users\Lukas Pelz\HKA-IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_aug  # replace with dataset_aufgabe2_Pruefung
+
+# WandB configuration
+wandb_entity: VDKI-Hasen
+wandb_project_name: VDKI-Hasen_Hyperparameter_Tuning_FD_ConvNext
+# wandb_project_name: VDKI-Hasen_Hyperparameter_Tuning_V3
+
+# Hyperparameter tuning using Optuna
+number_of_trials: 20
+
+wandb_experiment_name: binaryClassification_CNN
+learning_rate: 0.001
+seed: 42
+batch_size: 64
+max_epochs: 50
+image_size: 128
