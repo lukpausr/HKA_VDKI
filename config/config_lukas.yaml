@@ -19,8 +19,8 @@ name_list: [other, apollo,  aster, helios, nyx, selene]
 trainable_linear_layers: 1
 
 # FOLDERS FOR EXAM
-path_to_exam_data_a1: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe1_aug  # replace with dataset_aufgabe1_Pruefung
-path_to_exam_data_a2: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_aug  # replace with dataset_aufgabe2_Pruefung
+path_to_exam_data_a1: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe1_Pruefung  # replace with dataset_aufgabe1_Pruefung / dataset_aufgabe1_aug
+path_to_exam_data_a2: C:\Users\lukas\SynologyDrive_IMS/SS25_MSYS_KAER-AI-PoseAct/21_Test_Data/dataset_aufgabe2_Pruefung  # replace with dataset_aufgabe2_Pruefung / dataset_aufgabe2_aug
 
 # WandB configuration
 wandb_entity: VDKI-Hasen
